@@ -1,0 +1,42 @@
+<div class="header">
+    <script>
+        function logout() {
+            fetch('/auth/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(() => {
+                location.href = '/auth/login';
+            })
+            .catch(error => {
+                console.error('Error during registration:', error);
+                // Handle registration error
+            });
+        }
+    </script>
+    <div>
+        <% if(locals.user) { %>
+            <img class="header-img" src="/img/user/avatar.jpg" alt="Profile">
+            <div class="user-data" style="margin-left: 5px;">
+                <strong style="display: block; margin-bottom: 5px;"><%= user.firstName %> <%= user.lastName %> (CEO)</strong>
+                <div class="progress" style="display: flex;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 75%;"></div>
+                    </div>
+                    <img src="/img/ui/general_rank.png" alt="Генерал" style="display: block; max-height: 15px; width: auto; border: none; margin-left: 5px;">
+                </div>
+                
+                
+            </div>
+            <div class="buttons">
+                <button><img src="/img/ui/gear.png" alt="Настройки"></button>
+            </div>
+            <div class="buttons">
+                <button onclick="logout()"><img src="/img/ui/logout.png" alt="Выход"></button>
+            </div>
+        <% } else { %> 
+            <h1>РВИО</h1>
+        <% } %>
+    </div>
+</div>

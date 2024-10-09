@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/styles/style.css">
+        <title>РВИО</title>
+    </head>
+<body>
+    <script>
+        function showRegisterForm() {
+            const login_form = document.getElementById('form_login');
+            const register_form = document.getElementById('form_register');
+
+            if(register_form.classList.contains('none')) {
+                register_form.classList.remove('none');
+                login_form.classList.add('none');
+            } else {
+                register_form.classList.add('none');
+                login_form.classList.remove('none');
+            }
+        }
+
+        function submitLoginForm() {
+            const email = document.getElementById('login_email').value;
+            const password = document.getElementById('login_password').value;
+
+            fetch('/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                location.href = '/';
+            })
+            .catch(error => {
+                console.error('Error during login:', error);
+                // Handle login error
+            });
+        }
+
+        function submitRegisterForm() {
+            const firstName = document.getElementById('register_firstname').value;
+            const lastName = document.getElementById('register_lastname').value;
+            const email = document.getElementById('register_email').value;
+            const password = document.getElementById('register_password').value;
+
+            fetch('/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ firstName, lastName, email, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Registration successful:', data);
+                localStorage.setItem('accessToken', data.accessToken);
+                localStorage.setItem('refreshToken', data.refreshToken);
+                location.href = '/';
+            })
+            .catch(error => {
+                console.error('Error during registration:', error);
+                // Handle registration error
+            });
+        }
+    </script>
+    <%- include('refresh') %>
+    <%- include('header') %>
+    <div class="main-content">
+        <form id="form_login" action="/auth/login" method="POST">
+            <h2>Login</h2>
+            <div class="form-group">
+                <label for="login-email">Эл. почта</label>
+                <input type="email" id="login_email" name="login-email" required>
+            </div>
+            <div class="form-group">
+                <label for="login-password">Пароль</label>
+                <input type="password" id="login_password" name="login-password" required>
+            </div>
+            <button type="button" onclick="submitLoginForm()" class="btn">Войти</button>
+            <div class="social-login">
+                <a href="#" class="vk">ВК</a>
+                <a href="#" class="gosuslugi">Госуслуги</a>
+            </div>
+            <div style="margin: 20px;">
+                <h3>Не зарегистрированы? <button onclick="showRegisterForm()" style="text-decoration: underline; background-color: inherit; color: white;">Регистрация</button></h3>
+            </div>
+        </form>
+        
+        
+        <form class="none" id="form_register" action="/auth/register" method="POST">
+            <h2>Register</h2>
+            <div class="form-group">
+                <label for="register-firstname">Имя</label>
+                <input type="text" id="register_firstname" required>
+            </div>
+            <div class="form-group">
+                <label for="register-lastname">Фамилия</label>
+                <input type="text" id="register_lastname" required>
+            </div>
+            <div class="form-group">
+                <label for="register-email">Почта</label>
+                <input type="email" id="register_email" required>
+            </div>
+            <div class="form-group">
+                <label for="register-password">Пароль</label>
+                <input type="password" id="register_password" required>
+            </div>
+            <button type="button" onclick="submitRegisterForm()" class="btn">Зарегистрироваться</button>
+        </form>
+    </div>
+</body>
+</html>
