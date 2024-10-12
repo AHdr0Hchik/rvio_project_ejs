@@ -183,6 +183,8 @@ body {
     background: #2c2c2e;
 }
 
+
+
 .card img {
     width: 100%;
     border-radius: 10px;
@@ -190,6 +192,41 @@ body {
 }
 
 .card p {
+    margin: 10px 0;
+}
+
+/* Стили для overlay (фона), который блюрит всё, что позади */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    backdrop-filter: blur(5px); /* Размытие фона */
+    background-color: rgba(0, 0, 0, 0.4); /* Полупрозрачный фон */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1005;
+}
+
+/* Стили для модального окна */
+.card-modal {
+    border-radius: 10px;
+    width: 80%;
+    padding: 20px;
+    text-align: left;
+    background: #79797c;
+    z-index: 1006;
+}
+
+.card-modal img {
+    width: 100%;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.card-modal p {
     margin: 10px 0;
 }
 

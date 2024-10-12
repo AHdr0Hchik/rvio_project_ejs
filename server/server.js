@@ -41,13 +41,13 @@ console.log = function (...args) {
   const logFilePath = path.join(logDirectory, logFileName);
 
   // Форматируем сообщение
-  const message = args.map(arg => 
+  const log_msg = args.map(arg => 
     (typeof arg === 'object' ? JSON.stringify(arg) : String(arg))
   ).join(' ');
 
   // Добавляем временную метку
   const timestamp = new Date().toISOString();
-  const logMessage = `[${timestamp}] ${message}\n`;
+  const logMessage = `[${timestamp}] ${log_msg}\n`;
 
   // Записываем в файл
   fs.appendFileSync(logFilePath, logMessage);

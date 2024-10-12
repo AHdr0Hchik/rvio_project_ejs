@@ -2,7 +2,11 @@ const path = require('path');
 //const User = require('../classes/User');
 //const MailService = require('../classes/MailService');
 const bcrypt = require('bcryptjs');
+<<<<<<< HEAD
 const {User, Cards, users_cards, Events} = require('../sequelize/models');
+=======
+const {User, Cards, users_cards, Events, Event_participants} = require('../sequelize/models');
+>>>>>>> 0799346 (3rd commit)
 const {Op, where} = require('sequelize');
 const jwt = require('jsonwebtoken');
 const QRCode = require('qrcode');
@@ -160,9 +164,69 @@ exports.claim_card = async (req, res) => {
 }
 
 exports.get_events = async (req, res) => {
+<<<<<<< HEAD
     const events = await Events.findAll();
 
     return events, res.status(200);
+=======
+    try {
+        const events = await Events.findAll({
+            where: {
+                date: {[Op.gt]: new Date() }
+            }
+        });
+
+        const eventParticipants = await Event_participants.findAll({
+            include: [{
+              model: Events,
+              as: 'event'
+            }]
+        });
+        console.log(eventParticipants);
+        return res.json(JSON.stringify(events)).status(200);
+    } catch(e) {
+        console.log(e);
+        return res.redirect('/');
+    }
+}
+
+exports.get_reward = async (req, res) => {
+    try {
+        const { reward_id } = req.body;
+
+        const reward = await Cards.findByPk(reward_id);
+
+        return res.json(reward).status(200);
+    } catch(e) {
+        console.log(e);
+        return res.json('Error').status(500);
+    }
+}
+
+exports.to_participate = async (req, res) => {
+    try {
+        const userData = jwt.decode(req.cookies.accessToken);
+        const { event_id } = req.body;
+        const isParticipator = await Event_participants.findOne({
+            where: {
+                user_id: userData.user_id,
+                event_id: event_id
+            }
+        });
+        if(isParticipator) { 
+            return res.json({'message' : 'Вы уже участвуете!'}).status(200);
+        }
+        Event_participants.create({
+            user_id: userData.user_id,
+            event_id: event_id
+        }).then(() =>{
+            return res.json({'message': 'Вы записаны на участие!'}).status(200);
+        })
+    } catch(e) {
+        console.log(e);
+        return res.json({'message' : 'Ошибка'}).status(500);
+    }
+>>>>>>> 0799346 (3rd commit)
 }
 
 

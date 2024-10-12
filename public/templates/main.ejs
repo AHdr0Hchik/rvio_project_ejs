@@ -43,20 +43,30 @@
             text-decoration: none;
             cursor: pointer;
         }
+        
     </style>
     <%- include('refresh') %>
     <%- include('header') %>
     <div class="main-content">
         <div class="tabs">
+<<<<<<< HEAD
             <div class="tab active" data-tab="my_cards">Мои карточки</div>
             <div class="tab" data-tab="new_cards">Новые карточки</div>
             <div class="tab" data-tab="missed_cards">Упущенные карточки</div>
+=======
+            <div class="tab active" data-tab="my_cards" id="my_cards_tab">Мои карточки</div>
+            <div class="tab" data-tab="new_cards" id="new_cards_tab">Новые карточки</div>
+            <div class="tab" data-tab="missed_cards" id="missed_cards_tab">Упущенные карточки</div>
+            <div class="tab none" data-tab="my_events" id="my_events_tab">Мои события</div>
+            <div class="tab none" data-tab="new_events" id="new_events_tab">Новые события</div>
+>>>>>>> 0799346 (3rd commit)
             <div class="tab-indicator"></div>
         </div>
         <div class="card-container" id="my_cards">
             <% userCards.forEach(card => { %>
                 <div class="card" data-card="<%= card.id %>" onclick="showDetails(this)">
                     <img src="<%= card.imgSrc %>" alt="Card Image" id="card-image">
+<<<<<<< HEAD
                     <p><strong id="card-title"><%= card.name %></strong><br><%= card.shortDesc %></p>
                     <p id="card-description" hidden><%= card.fullDesc %></p>
                     <div class="card-footer">
@@ -79,6 +89,28 @@
             <% }); %>
         </div>
 
+=======
+                    <p><strong id="card-title"><%= card.name %></strong><br><%= card.shortDesc %></p>
+                    <p id="card-description" hidden><%= card.fullDesc %></p>
+                    <div class="card-footer">
+                        <div><span class="current-level"><%= card.card_lvl %></span> ур.</div>
+                        <div>+<span class="current-exp"><%= card.card_exp %></span> опыта</div>
+                    </div>
+                </div>
+            <% }); %> 
+        </div>
+        <div class="card-container none" id="new_cards">
+            <% availableCards.forEach(card => { %>
+                <div class="card" data-card="<%= card.id %>" onclick="showDetails(this)">
+                    <img src="<%= card.imgSrc %>" alt="Card Image" id="card-image">
+                    <p><strong id="card-title"><%= card.name %></strong><br><%= card.shortDesc %></p>
+                    <p id="card-description" hidden><%= card.fullDesc %></p>
+                    <div class="card-footer">
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+>>>>>>> 0799346 (3rd commit)
         <!-- Контейнер для упущенных карточек (можно добавить аналогично) -->
         <div class="card-container" id="missed_cards">
             <!-- Карточки упущенных карточек -->
@@ -104,6 +136,130 @@
     </div>
     <%- include('footer') %>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.4/html5-qrcode.min.js" integrity="sha512-k/KAe4Yff9EUdYI5/IAHlwUswqeipP+Cp5qnrsUjTPCgl51La2/JhyyjNciztD7mWNKLSXci48m7cctATKfLlQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<<<<<<< HEAD
+=======
+    
+    <!-- Значения кнопок апбара -->
+    <script>
+        const upbar_tabs_id = {
+            main: ['my_cards_tab', 'new_cards_tab', 'missed_cards_tab'],
+            events: ['my_events_tab', 'new_events_tab']
+        };
+    </script>
+
+    <!-- Принять участие в событии -->
+    <script>
+        document.addEventListener('click', function(event) {
+            if(event.target.id=='btn-participate') {
+                const event_id = event.target.dataset.event;
+                    fetch('/to_participate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ event_id: event_id }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data.message);
+                })
+                .catch(error => {
+                    console.error('Ошибка при отправке данных:', error);
+                });
+            }
+        });
+    </script>
+    <!-- Рендер событий -->
+    <script>
+        function createCard(event) {
+            const eventDiv = document.createElement('div');
+            eventDiv.className = 'card';
+            eventDiv.dataset.card = event.id;
+            eventDiv.dataset.reward = event.reward_id;
+            eventDiv.setAttribute('onclick', 'showDetails(this)');
+            //eventDiv.onclick = function() { showDetails(this); };
+
+            eventDiv.innerHTML = `
+                <img id="card-image" src="${event.imgSrc}" alt="Card Image">
+                <p><strong id="card-title" >${event.name}</strong>
+                <p id="card-description" hidden>${event.description}</p>
+                <div class="card-footer">
+                    <div><span class="current-level">${event.address}</span></div>
+                    <div><span class="current-exp">${new Date(event.date).toLocaleString('ru-RU', {year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'UTC'})}</span></div>
+                </div>
+            `;
+
+            return eventDiv;
+        }
+
+        function createCardContainer(eventsCards) {
+            const container = document.createElement('div');
+            container.className = 'card-container';
+            container.id = 'events_container';
+
+            eventsCards.forEach(event => {
+                const eventElement = createCard(event);
+                container.appendChild(eventElement);
+            });
+
+            document.querySelector('.main-content').appendChild(container);
+
+            const details = document.createElement('div');
+            details.className='details-panel';
+            details.id='detailsPanel';
+            details.innerHTML=
+            `<span class="close-btn" onclick="hideDetails()">×</span>
+            <img onclick="" src="https://via.placeholder.com/300x150" alt="Detail Image" id="detailImage">
+            <h1 id="detailTitle"></h1>
+            <br>
+            <p style="text-align: justify; margin: 15px; overflow-y: auto; max-height: 20vh; line-height: 20px" id="detailDescription"></p>
+            <br>
+            <button style="background-color: #878792; border: none; border-radius: 20px; height: 60px; width: 180px; color: white; font-size: 24px" id="btn-participate" data-event="">Участвовать</button> 
+            `
+            document.querySelector('.main-content').appendChild(details);
+            
+        }
+
+        document.querySelector('#btn_events').addEventListener('click', function(event) {
+            //if(event.target.classList.contains('active')) { return };
+
+            fetch('/get_events', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }).then(response => response.json())
+            .then(data => {
+                event.target.classList.add('active');
+                const main_content = document.querySelector('.main-content');
+
+                const upbar = main_content.querySelector('.tabs');
+                const tabs = upbar.querySelectorAll('.tab');
+
+                tabs.forEach(tab => {
+                    if(upbar_tabs_id.events.includes(tab.id)) {
+                        if(tab.classList.contains('none')) {
+                            tab.classList.remove('none');
+                        }
+                    } else {
+                        if(!tab.classList.contains('none')) {
+                            tab.classList.add('none');
+                        }
+                    }
+                });
+
+                main_content.innerHTML = '';
+                main_content.appendChild(upbar);
+                createCardContainer(JSON.parse(data));
+            })
+            .catch(error => {
+                console.error('Ошибка при отправке данных:', error);
+            });
+        });
+     </script>
+
+    <!-- Получение карточки -->
+>>>>>>> 0799346 (3rd commit)
     <script>
         document.querySelector('#detailClaim').addEventListener('click', function() {
             fetch('/claim_card', {
@@ -123,6 +279,11 @@
             });
         })
     </script>
+<<<<<<< HEAD
+=======
+
+    <!-- Подводка под кнопками  -->
+>>>>>>> 0799346 (3rd commit)
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const tabs = document.querySelectorAll('.tab');
@@ -170,6 +331,12 @@
             }
         });
     </script>
+<<<<<<< HEAD
+=======
+
+
+    <!-- Сканер qr-кодов -->
+>>>>>>> 0799346 (3rd commit)
     <script>
        window.onload = function () {
             const qrPopup = document.getElementById('qr-popup');
@@ -225,7 +392,7 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ qrData: decodedText }),
+                    body: JSON.stringify({ qrData: decodedText })
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -275,6 +442,8 @@
             fillExpBar(expSum);
         });
     </script>
+
+    <!-- Заполнение полоски уровня -->
     <script>
         function fillExpBar(experience) {
             const progressBarFill = document.querySelector('.progress-fill');
@@ -284,12 +453,78 @@
             console.log(experience + '/' + maxExperience);
         }
     </script>
+
+    <!-- Создание модального окна награды -->
     <script>
+        function createModal(card) {
+            const modalHtml = `
+                <div class="modal-overlay" id="card_modal">
+                    <div class="card-modal">
+                        <span class="close">&times;</span>
+                        <img src="${card.imgSrc}" alt="Card Image" id="card-image">
+                        <p><strong id="card-title">${card.name}</strong><br>${card.shortDesc}</p>
+                        <div class="card-footer">
+                            <div>+<span class="current-exp">${card.baseExp}</span> опыта</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+            const modal = document.getElementById('card_modal');
+            const closeBtn = document.querySelector('.close');
+
+            // Закрытие модального окна при клике на крестик
+            closeBtn.onclick = function() {
+                modal.remove();
+            };
+
+            // Закрытие модального окна при клике вне его
+            window.onclick = function(event) {
+                if (event.target === modal) {
+                    modal.remove();
+                }
+            };
+        }
+    </script>
+
+    <!-- Детали о карточке -->
+    <script>
+        function showRewardData(reward_id) {
+            fetch('/get_reward', {
+                method: 'POST',
+                headers: {
+                        'Content-Type': 'application/json',
+                    },
+                body: JSON.stringify({ reward_id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                createModal(data);
+            })
+            .catch(error => {
+                console.error('Ошибка при отправке данных:', error);
+            });
+        }
+
         function showDetails(card) {
+<<<<<<< HEAD
             console.log(card);
             document.getElementById('detailTitle').textContent = card.querySelector('#card-title').innerText;
             document.getElementById('detailDescription').textContent = card.querySelector('#card-description').innerText;
             document.getElementById('detailImage').src = card.querySelector('#card-image').src;
+=======
+            if(card.hasAttribute('data-reward')) {
+                document.querySelector('#detailImage').setAttribute('onclick', `showRewardData(${card.dataset.reward})`);
+            }
+            if(document.getElementById('btn-participate')) {
+                document.getElementById('btn-participate').dataset.event = card.dataset.card;
+            }
+            document.getElementById('detailTitle').innerText = card.querySelector('#card-title').innerText || '';
+            document.getElementById('detailDescription').innerText = card.querySelector('#card-description').innerText || '';
+            document.getElementById('detailImage').src = card.querySelector('#card-image').src || '';
+>>>>>>> 0799346 (3rd commit)
             document.getElementById('detailsPanel').classList.add('active');
             document.getElementById('detailClaim').dataset.card = card.dataset.card;
         }
@@ -298,6 +533,8 @@
             document.getElementById('detailsPanel').classList.remove('active');
         }
     </script>
+
+    <!-- Фоны карточек -->
     <script>
         const colors = [
             '#FFB6C1', // Light Pink
