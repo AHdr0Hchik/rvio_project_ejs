@@ -71,7 +71,7 @@ body {
 }
 
 .header .buttons {
-    margin-left: 20px;
+    margin-left: 5px;
     display: flex;
     gap: 10px;
 }
@@ -97,7 +97,7 @@ body {
 
 .header .user-data .progress-bar {
     display: flex;
-    width: 100px;
+    width: 70px;
     height: 15px;
     background-color: #767676; /* Light gray background */
     border-radius: 7px;
@@ -121,19 +121,32 @@ body {
 }
 
 .tabs {
+    position: relative;
     display: flex;
     justify-content: center;
     margin-bottom: 20px;
 }
 
-.tabs div {
+.tab {
+    position: relative;
     margin: 0 10px;
     padding: 10px 20px;
     cursor: pointer;
+    font-weight: bold;
+    color: #797979;
 }
 
-.tabs .active {
-    border-bottom: 2px solid #ffcc00;
+.tab.active {
+    color: #ffcc00;
+}
+
+.tab-indicator {
+    position: absolute;
+    bottom: 0;
+    height: 2px;
+    width: 0;
+    background-color: #ffcc00;
+    transition: left 0.3s ease, width 0.3s ease;
 }
 
 .qr-scan {
@@ -158,6 +171,7 @@ body {
     justify-content: space-around;
     flex-wrap: wrap;
     gap: 20px;
+    margin-bottom: 25px;
 }
 
 .card {
@@ -169,6 +183,8 @@ body {
     background: #2c2c2e;
 }
 
+
+
 .card img {
     width: 100%;
     border-radius: 10px;
@@ -176,6 +192,41 @@ body {
 }
 
 .card p {
+    margin: 10px 0;
+}
+
+/* Стили для overlay (фона), который блюрит всё, что позади */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    backdrop-filter: blur(5px); /* Размытие фона */
+    background-color: rgba(0, 0, 0, 0.4); /* Полупрозрачный фон */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1005;
+}
+
+/* Стили для модального окна */
+.card-modal {
+    border-radius: 10px;
+    width: 80%;
+    padding: 20px;
+    text-align: left;
+    background: #79797c;
+    z-index: 1006;
+}
+
+.card-modal img {
+    width: 100%;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.card-modal p {
     margin: 10px 0;
 }
 

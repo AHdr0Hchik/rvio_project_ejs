@@ -26,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
     card_exp: DataTypes.INTEGER
   }, {
     sequelize,
-    modelName: 'UserCards',
+    modelName: 'users_cards',
     timestamps: false
   });
   return UserCards;

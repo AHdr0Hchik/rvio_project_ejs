@@ -24,6 +24,7 @@
                     <div class="progress-bar">
                         <div class="progress-fill" style="width: 75%;"></div>
                     </div>
+                    <span> <%= user.lvl %> ур.</span>
                     <img src="/img/ui/general_rank.png" alt="Генерал" style="display: block; max-height: 15px; width: auto; border: none; margin-left: 5px;">
                 </div>
                 
@@ -31,8 +32,6 @@
             </div>
             <div class="buttons">
                 <button><img src="/img/ui/gear.png" alt="Настройки"></button>
-            </div>
-            <div class="buttons">
                 <button onclick="logout()"><img src="/img/ui/logout.png" alt="Выход"></button>
             </div>
         <% } else { %> 

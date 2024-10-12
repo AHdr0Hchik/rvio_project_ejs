@@ -43,109 +43,260 @@
             text-decoration: none;
             cursor: pointer;
         }
+        
     </style>
     <%- include('refresh') %>
     <%- include('header') %>
-    
     <div class="main-content">
         <div class="tabs">
-            <div class="active">Мои карточки</div>
-            <div>Новые карточки</div>
-            <div>Упущенные карточки</div>
+            <div class="tab active" data-tab="my_cards" id="my_cards_tab">Мои карточки</div>
+            <div class="tab" data-tab="new_cards" id="new_cards_tab">Новые карточки</div>
+            <div class="tab" data-tab="missed_cards" id="missed_cards_tab">Упущенные карточки</div>
+            <div class="tab none" data-tab="my_events" id="my_events_tab">Мои события</div>
+            <div class="tab none" data-tab="new_events" id="new_events_tab">Новые события</div>
+            <div class="tab-indicator"></div>
         </div>
-        <div class="card-container">
-            <% cards.forEach(card => { %>
-                <div class="card" onclick="showDetails(this)">
-                    <img src="/img/cards/cardImg1.jpg" alt="Card Image" id="card-image">
+        <div class="card-container" id="my_cards">
+            <% userCards.forEach(card => { %>
+                <div class="card" data-card="<%= card.id %>" onclick="showDetails(this)">
+                    <img src="<%= card.imgSrc %>" alt="Card Image" id="card-image">
                     <p><strong id="card-title"><%= card.name %></strong><br><%= card.shortDesc %></p>
                     <p id="card-description" hidden><%= card.fullDesc %></p>
                     <div class="card-footer">
-                        <div>lvl <span class="current-level">19</span></div>
-                        <div>+<span class="current-exp"><%= card.baseExp %></span> опыта</div>
+                        <div><span class="current-level"><%= card.card_lvl %></span> ур.</div>
+                        <div>+<span class="current-exp"><%= card.card_exp %></span> опыта</div>
+                    </div>
+                </div>
+            <% }); %> 
+        </div>
+        <div class="card-container none" id="new_cards">
+            <% availableCards.forEach(card => { %>
+                <div class="card" data-card="<%= card.id %>" onclick="showDetails(this)">
+                    <img src="<%= card.imgSrc %>" alt="Card Image" id="card-image">
+                    <p><strong id="card-title"><%= card.name %></strong><br><%= card.shortDesc %></p>
+                    <p id="card-description" hidden><%= card.fullDesc %></p>
+                    <div class="card-footer">
                     </div>
                 </div>
             <% }); %>
-            <!-- Модальное окно -->
-            <div id="qr-popup" class="popup">
-                <div class="popup-content">
-                    <span class="close-btn" id="close-popup">&times;</span>
-                    <h2>Сканировать QR-код</h2>
-                    <div id="qr-reader" style="width: 300px;"></div>
-                    <div id="qr-reader-results"></div>
-                </div>
-            </div>
-            <!-- <div class="card-tmp" onclick="showDetails(this)">
-                <img src="/img/cards/cardImg1.jpg" alt="Card Image" id="card-image">
-                <p><strong id="card-title">День сухопутных войск России</strong><br>За Родину, за Победу!</p>
-                <p id="card-description" hidden>💪 1 октября - День сухопутных войск России! 🪖 Поздравляем всех, кто защищает нашу Родину на суше! 🎉  Ваша сила и мужество - пример для всех! 🇷🇺</p>
-                <div class="card-footer">
-                    <div>lvl 5</div>
-                    <div>+50 опыта</div>
-                </div>
-            </div>
-            <div class="card-tmp" onclick="showDetails(this)">
-                <img src="/img/cards/cardImg2.jpg" alt="Card Image" id="card-image">
-                <p><strong id="card-title">День Военно-Морского Флота России</strong><br>Сила и слава российского флота!</p>
-                <p id="card-description" hidden>⚓ 28 июля - День Военно-Морского Флота России! 🌊 Поздравляем всех моряков, которые защищают наши морские рубежи! 🚢  Ваша служба - это  верность, мужество и честь! 🇷🇺</p>
-                <div class="card-footer">
-                    <div>lvl 3</div>
-                    <div>+30 опыта</div>
-                </div>
-            </div>
-            
-            <div class="card-tmp" onclick="showDetails(this)">
-                <img src="/img/cards/cardImg3.jpg" alt="Card Image" id="card-image">
-                <p><strong id="card-title">День Воздушно-десантных войск России</strong><br>Крылатая гвардия России!</p>
-                <p id="card-description" hidden>🪂 2 августа - День Воздушно-десантных войск России! ✈️ Поздравляем всех десантников, которые  с честью выполняют свой долг! 🚀  Ваша смелость и  отвага -  пример для всех! 🇷🇺</p>
-                <div class="card-footer">
-                    <div>lvl 8</div>
-                    <div>+80 опыта</div>
-                </div>
-            </div>
-            
-            <div class="card-tmp" onclick="showDetails(this)">
-                <img src="/img/cards/cardImg4.jpg" alt="Card Image" id="card-image">
-                <p><strong id="card-title">День ракетных войск стратегического назначения</strong><br>Стражи нашей Родины!</p>
-                <p id="card-description" hidden>🚀 17 декабря - День ракетных войск стратегического назначения! 🛰️ Поздравляем всех ракетчиков, которые  несут  важнейшую службу по защите нашей страны! 🛡️ Ваша  преданность и  отвага -  настоящий пример! 🇷🇺</p>
-                <div class="card-footer">
-                    <div>lvl 2</div>
-                    <div>+20 опыта</div>
-                </div>
-            </div>
-            
-            <div class="card-tmp" onclick="showDetails(this)">
-                <img src="/img/cards/cardImg5.jpg" alt="Card Image" id="card-image">
-                <p><strong id="card-title">День Победы</strong><br>Никто не забыт, ничто не забыто!</p>
-                <p id="card-description" hidden>🕊️ 9 мая - День Победы! 🇷🇺 Помним и чтим подвиг наших предков, которые  защитили Родину от фашизма!  🪖  Вечная память героям! 🤝  Мир всем! 🕊️</p>
-                <div class="card-footer">
-                    <div>lvl 10</div>
-                    <div>+200 опыта</div>
-                </div>
-            </div>
-            
-            <div class="card-tmp" onclick="showDetails(this)">
-                <img src="/img/cards/cardImg6.jpg" alt="Card Image" id="card-image">
-                <p><strong id="card-title">День защитника Отечества</strong><br>С праздником, защитники!</p>
-                <p id="card-description" hidden>💪 23 февраля - День защитника Отечества! 🪖  Поздравляем всех мужчин, которые  служат и  служили Родине! 🇷🇺  Ваша  храбрость и  отвага -  наша гордость! 🎉</p>
-                <div class="card-footer">
-                    <div>lvl 10</div>
-                    <div>+50 опыта</div>
-                </div>
-            </div> -->
         </div>
-    
+        <!-- Контейнер для упущенных карточек (можно добавить аналогично) -->
+        <div class="card-container" id="missed_cards">
+            <!-- Карточки упущенных карточек -->
+        </div>
+
+        <!-- Модальное окно -->
+        <div id="qr-popup" class="popup">
+            <div class="popup-content">
+                <span class="close-btn" id="close-popup">&times;</span>
+                <h2>Сканировать QR-код</h2>
+                <div id="qr-reader" style="width: 300px;"></div>
+                <div id="qr-reader-results"></div>
+            </div>
+        </div>
         <div class="details-panel" id="detailsPanel">
             <span class="close-btn" onclick="hideDetails()">×</span>
             <img src="https://via.placeholder.com/300x150" alt="Detail Image" id="detailImage">
             <h2 id="detailTitle">Я успеваю сделать все</h2>
             <p id="detailDescription">Передвигаюсь по городу без пробок и не ищу заправки</p>
             <br>
-            <div class="details-footer">Вы владеете этой картой</div>
+            <div class="details-footer" id="detailClaim" data-card="">Получить</div>
         </div>
     </div>
     <%- include('footer') %>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.4/html5-qrcode.min.js" integrity="sha512-k/KAe4Yff9EUdYI5/IAHlwUswqeipP+Cp5qnrsUjTPCgl51La2/JhyyjNciztD7mWNKLSXci48m7cctATKfLlQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     
+    <!-- Значения кнопок апбара -->
+    <script>
+        const upbar_tabs_id = {
+            main: ['my_cards_tab', 'new_cards_tab', 'missed_cards_tab'],
+            events: ['my_events_tab', 'new_events_tab']
+        };
+    </script>
+
+    <!-- Принять участие в событии -->
+    <script>
+        document.addEventListener('click', function(event) {
+            if(event.target.id=='btn-participate') {
+                const event_id = event.target.dataset.event;
+                    fetch('/to_participate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ event_id: event_id }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data.message);
+                })
+                .catch(error => {
+                    console.error('Ошибка при отправке данных:', error);
+                });
+            }
+        });
+    </script>
+    <!-- Рендер событий -->
+    <script>
+        function createCard(event) {
+            const eventDiv = document.createElement('div');
+            eventDiv.className = 'card';
+            eventDiv.dataset.card = event.id;
+            eventDiv.dataset.reward = event.reward_id;
+            eventDiv.setAttribute('onclick', 'showDetails(this)');
+            //eventDiv.onclick = function() { showDetails(this); };
+
+            eventDiv.innerHTML = `
+                <img id="card-image" src="${event.imgSrc}" alt="Card Image">
+                <p><strong id="card-title" >${event.name}</strong>
+                <p id="card-description" hidden>${event.description}</p>
+                <div class="card-footer">
+                    <div><span class="current-level">${event.address}</span></div>
+                    <div><span class="current-exp">${new Date(event.date).toLocaleString('ru-RU', {year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'UTC'})}</span></div>
+                </div>
+            `;
+
+            return eventDiv;
+        }
+
+        function createCardContainer(eventsCards) {
+            const container = document.createElement('div');
+            container.className = 'card-container';
+            container.id = 'events_container';
+
+            eventsCards.forEach(event => {
+                const eventElement = createCard(event);
+                container.appendChild(eventElement);
+            });
+
+            document.querySelector('.main-content').appendChild(container);
+
+            const details = document.createElement('div');
+            details.className='details-panel';
+            details.id='detailsPanel';
+            details.innerHTML=
+            `<span class="close-btn" onclick="hideDetails()">×</span>
+            <img onclick="" src="https://via.placeholder.com/300x150" alt="Detail Image" id="detailImage">
+            <h1 id="detailTitle"></h1>
+            <br>
+            <p style="text-align: justify; margin: 15px; overflow-y: auto; max-height: 20vh; line-height: 20px" id="detailDescription"></p>
+            <br>
+            <button style="background-color: #878792; border: none; border-radius: 20px; height: 60px; width: 180px; color: white; font-size: 24px" id="btn-participate" data-event="">Участвовать</button> 
+            `
+            document.querySelector('.main-content').appendChild(details);
+            
+        }
+
+        document.querySelector('#btn_events').addEventListener('click', function(event) {
+            //if(event.target.classList.contains('active')) { return };
+
+            fetch('/get_events', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }).then(response => response.json())
+            .then(data => {
+                event.target.classList.add('active');
+                const main_content = document.querySelector('.main-content');
+
+                const upbar = main_content.querySelector('.tabs');
+                const tabs = upbar.querySelectorAll('.tab');
+
+                tabs.forEach(tab => {
+                    if(upbar_tabs_id.events.includes(tab.id)) {
+                        if(tab.classList.contains('none')) {
+                            tab.classList.remove('none');
+                        }
+                    } else {
+                        if(!tab.classList.contains('none')) {
+                            tab.classList.add('none');
+                        }
+                    }
+                });
+
+                main_content.innerHTML = '';
+                main_content.appendChild(upbar);
+                createCardContainer(JSON.parse(data));
+            })
+            .catch(error => {
+                console.error('Ошибка при отправке данных:', error);
+            });
+        });
+     </script>
+
+    <!-- Получение карточки -->
+    <script>
+        document.querySelector('#detailClaim').addEventListener('click', function() {
+            fetch('/claim_card', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ card_id: this.dataset.card }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Карта доавлена!');
+                window.location.replace('/');
+            })
+            .catch(error => {
+                console.error('Ошибка при отправке данных:', error);
+            });
+        })
+    </script>
+
+    <!-- Подводка под кнопками  -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.tab');
+            const tabIndicator = document.querySelector('.tab-indicator');
+            const cardContainers = document.querySelectorAll('.card-container');
+        
+            function updateIndicator(tab) {
+                const tabRect = tab.getBoundingClientRect();
+                const parentRect = tab.parentElement.getBoundingClientRect();
+
+                const tabWidth = tabRect.width;
+                const tabLeft = tabRect.left - parentRect.left;
+
+                tabIndicator.style.width = `${tabWidth}px`;
+                tabIndicator.style.left = `${tabLeft}px`;
+            }
+        
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Снимаем класс 'active' со всех вкладок
+                    tabs.forEach(t => t.classList.remove('active'));
+                    // Добавляем класс 'active' к выбранной вкладке
+                    this.classList.add('active');
+        
+                    // Обновляем позицию индикатора
+                    updateIndicator(this);
+        
+                    // Скрываем все контейнеры карточек
+                    cardContainers.forEach(container => {
+                        container.classList.remove('active');
+                        container.classList.add('none');
+                    });
+                    // Отображаем связанный контейнер
+                    const tabName = this.getAttribute('data-tab');
+                    document.getElementById(tabName).classList.add('active');
+                    document.getElementById(tabName).classList.remove('none');
+
+                });
+            });
+        
+            // Инициализируем позицию индикатора при загрузке страницы
+            const initialTab = document.querySelector('.tab.active');
+            if (initialTab) {
+                updateIndicator(initialTab);
+            }
+        });
+    </script>
+
+
+    <!-- Сканер qr-кодов -->
     <script>
        window.onload = function () {
             const qrPopup = document.getElementById('qr-popup');
@@ -201,13 +352,14 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ qrData: decodedText }),
+                    body: JSON.stringify({ qrData: decodedText })
                 })
                 .then(response => response.json())
                 .then(data => {
                     console.log(data);
                     closePopup();
                     alert('QR-код успешно отправлен на сервер!');
+                    window.location.replace('/');
                 })
                 .catch(error => {
                     console.error('Ошибка при отправке данных:', error);
@@ -243,28 +395,89 @@
                 const cardLevel = parseInt(levelElement.innerText, 10);
                 const cardExp = parseInt(expElement.innerText, 10);
                 
-                const cardSum = cardExp * cardLevel;
+                const cardSum = cardExp;
                 expElement.innerText = cardSum;
                 expSum += cardSum;
             });
-            console.log('!'+expSum);
             fillExpBar(expSum);
         });
     </script>
+
+    <!-- Заполнение полоски уровня -->
     <script>
         function fillExpBar(experience) {
-            console.log(experience);
             const progressBarFill = document.querySelector('.progress-fill');
-            const maxExperience = 200; // Example maximum experience points
+            const maxExperience = parseInt(100 * Math.pow(3, <%= user.lvl %> - 1)); // Example maximum experience points
             const progressPercentage = (experience / maxExperience) * 100;
             progressBarFill.style.width = progressPercentage + '%';
+            console.log(experience + '/' + maxExperience);
         }
     </script>
+
+    <!-- Создание модального окна награды -->
     <script>
+        function createModal(card) {
+            const modalHtml = `
+                <div class="modal-overlay" id="card_modal">
+                    <div class="card-modal">
+                        <span class="close">&times;</span>
+                        <img src="${card.imgSrc}" alt="Card Image" id="card-image">
+                        <p><strong id="card-title">${card.name}</strong><br>${card.shortDesc}</p>
+                        <div class="card-footer">
+                            <div>+<span class="current-exp">${card.baseExp}</span> опыта</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+            const modal = document.getElementById('card_modal');
+            const closeBtn = document.querySelector('.close');
+
+            // Закрытие модального окна при клике на крестик
+            closeBtn.onclick = function() {
+                modal.remove();
+            };
+
+            // Закрытие модального окна при клике вне его
+            window.onclick = function(event) {
+                if (event.target === modal) {
+                    modal.remove();
+                }
+            };
+        }
+    </script>
+
+    <!-- Детали о карточке -->
+    <script>
+        function showRewardData(reward_id) {
+            fetch('/get_reward', {
+                method: 'POST',
+                headers: {
+                        'Content-Type': 'application/json',
+                    },
+                body: JSON.stringify({ reward_id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                createModal(data);
+            })
+            .catch(error => {
+                console.error('Ошибка при отправке данных:', error);
+            });
+        }
+
         function showDetails(card) {
-            document.getElementById('detailTitle').textContent = card.querySelector('#card-title').innerText;
-            document.getElementById('detailDescription').textContent = card.querySelector('#card-description').innerText;
-            document.getElementById('detailImage').src = card.querySelector('#card-image').src;
+            if(card.hasAttribute('data-reward')) {
+                document.querySelector('#detailImage').setAttribute('onclick', `showRewardData(${card.dataset.reward})`);
+            }
+            if(document.getElementById('btn-participate')) {
+                document.getElementById('btn-participate').dataset.event = card.dataset.card;
+            }
+            document.getElementById('detailTitle').innerText = card.querySelector('#card-title').innerText || '';
+            document.getElementById('detailDescription').innerText = card.querySelector('#card-description').innerText || '';
+            document.getElementById('detailImage').src = card.querySelector('#card-image').src || '';
             document.getElementById('detailsPanel').classList.add('active');
         }
 
@@ -272,6 +485,8 @@
             document.getElementById('detailsPanel').classList.remove('active');
         }
     </script>
+
+    <!-- Фоны карточек -->
     <script>
         const colors = [
             '#FFB6C1', // Light Pink

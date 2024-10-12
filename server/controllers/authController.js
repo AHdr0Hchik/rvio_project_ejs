@@ -48,7 +48,7 @@ exports.login_post = async (req, res) => {
 
         await refresh_tokens.create({ user_id: user.id, token: refreshTokens });
 
-        return res.cookie('accessToken', accessToken, {maxAge: 1000*60*60, httpOnly: true}).cookie('refreshToken', refreshTokens, {maxAge: 1000*60*60*24*180, httpOnly: true}).json({ accessToken, refreshTokens });
+        return res.cookie('accessToken', accessToken, {maxAge: 1000*60*15, httpOnly: true}).cookie('refreshToken', refreshTokens, {maxAge: 1000*60*60*24*7, httpOnly: true}).json({ accessToken, refreshTokens });
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: 'Database error' });
