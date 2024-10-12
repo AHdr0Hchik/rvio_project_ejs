@@ -46,106 +46,130 @@
     </style>
     <%- include('refresh') %>
     <%- include('header') %>
-    
     <div class="main-content">
         <div class="tabs">
-            <div class="active">Мои карточки</div>
-            <div>Новые карточки</div>
-            <div>Упущенные карточки</div>
+            <div class="tab active" data-tab="my_cards">Мои карточки</div>
+            <div class="tab" data-tab="new_cards">Новые карточки</div>
+            <div class="tab" data-tab="missed_cards">Упущенные карточки</div>
+            <div class="tab-indicator"></div>
         </div>
-        <div class="card-container">
-            <% cards.forEach(card => { %>
-                <div class="card" onclick="showDetails(this)">
-                    <img src="/img/cards/cardImg1.jpg" alt="Card Image" id="card-image">
+        <div class="card-container" id="my_cards">
+            <% userCards.forEach(card => { %>
+                <div class="card" data-card="<%= card.id %>" onclick="showDetails(this)">
+                    <img src="<%= card.imgSrc %>" alt="Card Image" id="card-image">
                     <p><strong id="card-title"><%= card.name %></strong><br><%= card.shortDesc %></p>
                     <p id="card-description" hidden><%= card.fullDesc %></p>
                     <div class="card-footer">
-                        <div>lvl <span class="current-level">19</span></div>
-                        <div>+<span class="current-exp"><%= card.baseExp %></span> опыта</div>
+                        <div><span class="current-level"><%= card.card_lvl %></span> ур.</div>
+                        <div>+<span class="current-exp"><%= card.card_exp %></span> опыта</div>
                     </div>
                 </div>
             <% }); %>
-            <!-- Модальное окно -->
-            <div id="qr-popup" class="popup">
-                <div class="popup-content">
-                    <span class="close-btn" id="close-popup">&times;</span>
-                    <h2>Сканировать QR-код</h2>
-                    <div id="qr-reader" style="width: 300px;"></div>
-                    <div id="qr-reader-results"></div>
-                </div>
-            </div>
-            <!-- <div class="card-tmp" onclick="showDetails(this)">
-                <img src="/img/cards/cardImg1.jpg" alt="Card Image" id="card-image">
-                <p><strong id="card-title">День сухопутных войск России</strong><br>За Родину, за Победу!</p>
-                <p id="card-description" hidden>💪 1 октября - День сухопутных войск России! 🪖 Поздравляем всех, кто защищает нашу Родину на суше! 🎉  Ваша сила и мужество - пример для всех! 🇷🇺</p>
-                <div class="card-footer">
-                    <div>lvl 5</div>
-                    <div>+50 опыта</div>
-                </div>
-            </div>
-            <div class="card-tmp" onclick="showDetails(this)">
-                <img src="/img/cards/cardImg2.jpg" alt="Card Image" id="card-image">
-                <p><strong id="card-title">День Военно-Морского Флота России</strong><br>Сила и слава российского флота!</p>
-                <p id="card-description" hidden>⚓ 28 июля - День Военно-Морского Флота России! 🌊 Поздравляем всех моряков, которые защищают наши морские рубежи! 🚢  Ваша служба - это  верность, мужество и честь! 🇷🇺</p>
-                <div class="card-footer">
-                    <div>lvl 3</div>
-                    <div>+30 опыта</div>
-                </div>
-            </div>
             
-            <div class="card-tmp" onclick="showDetails(this)">
-                <img src="/img/cards/cardImg3.jpg" alt="Card Image" id="card-image">
-                <p><strong id="card-title">День Воздушно-десантных войск России</strong><br>Крылатая гвардия России!</p>
-                <p id="card-description" hidden>🪂 2 августа - День Воздушно-десантных войск России! ✈️ Поздравляем всех десантников, которые  с честью выполняют свой долг! 🚀  Ваша смелость и  отвага -  пример для всех! 🇷🇺</p>
-                <div class="card-footer">
-                    <div>lvl 8</div>
-                    <div>+80 опыта</div>
-                </div>
-            </div>
-            
-            <div class="card-tmp" onclick="showDetails(this)">
-                <img src="/img/cards/cardImg4.jpg" alt="Card Image" id="card-image">
-                <p><strong id="card-title">День ракетных войск стратегического назначения</strong><br>Стражи нашей Родины!</p>
-                <p id="card-description" hidden>🚀 17 декабря - День ракетных войск стратегического назначения! 🛰️ Поздравляем всех ракетчиков, которые  несут  важнейшую службу по защите нашей страны! 🛡️ Ваша  преданность и  отвага -  настоящий пример! 🇷🇺</p>
-                <div class="card-footer">
-                    <div>lvl 2</div>
-                    <div>+20 опыта</div>
-                </div>
-            </div>
-            
-            <div class="card-tmp" onclick="showDetails(this)">
-                <img src="/img/cards/cardImg5.jpg" alt="Card Image" id="card-image">
-                <p><strong id="card-title">День Победы</strong><br>Никто не забыт, ничто не забыто!</p>
-                <p id="card-description" hidden>🕊️ 9 мая - День Победы! 🇷🇺 Помним и чтим подвиг наших предков, которые  защитили Родину от фашизма!  🪖  Вечная память героям! 🤝  Мир всем! 🕊️</p>
-                <div class="card-footer">
-                    <div>lvl 10</div>
-                    <div>+200 опыта</div>
-                </div>
-            </div>
-            
-            <div class="card-tmp" onclick="showDetails(this)">
-                <img src="/img/cards/cardImg6.jpg" alt="Card Image" id="card-image">
-                <p><strong id="card-title">День защитника Отечества</strong><br>С праздником, защитники!</p>
-                <p id="card-description" hidden>💪 23 февраля - День защитника Отечества! 🪖  Поздравляем всех мужчин, которые  служат и  служили Родине! 🇷🇺  Ваша  храбрость и  отвага -  наша гордость! 🎉</p>
-                <div class="card-footer">
-                    <div>lvl 10</div>
-                    <div>+50 опыта</div>
-                </div>
-            </div> -->
         </div>
-    
+        <div class="card-container none" id="new_cards">
+            <% availableCards.forEach(card => { %>
+                <div class="card" data-card="<%= card.id %>" onclick="showDetails(this)">
+                    <img src="<%= card.imgSrc %>" alt="Card Image" id="card-image">
+                    <p><strong id="card-title"><%= card.name %></strong><br><%= card.shortDesc %></p>
+                    <p id="card-description" hidden><%= card.fullDesc %></p>
+                    <div class="card-footer">
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+
+        <!-- Контейнер для упущенных карточек (можно добавить аналогично) -->
+        <div class="card-container" id="missed_cards">
+            <!-- Карточки упущенных карточек -->
+        </div>
+
+        <!-- Модальное окно -->
+        <div id="qr-popup" class="popup">
+            <div class="popup-content">
+                <span class="close-btn" id="close-popup">&times;</span>
+                <h2>Сканировать QR-код</h2>
+                <div id="qr-reader" style="width: 300px;"></div>
+                <div id="qr-reader-results"></div>
+            </div>
+        </div>
         <div class="details-panel" id="detailsPanel">
             <span class="close-btn" onclick="hideDetails()">×</span>
             <img src="https://via.placeholder.com/300x150" alt="Detail Image" id="detailImage">
             <h2 id="detailTitle">Я успеваю сделать все</h2>
             <p id="detailDescription">Передвигаюсь по городу без пробок и не ищу заправки</p>
             <br>
-            <div class="details-footer">Вы владеете этой картой</div>
+            <div class="details-footer" id="detailClaim" data-card="">Получить</div>
         </div>
     </div>
     <%- include('footer') %>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.4/html5-qrcode.min.js" integrity="sha512-k/KAe4Yff9EUdYI5/IAHlwUswqeipP+Cp5qnrsUjTPCgl51La2/JhyyjNciztD7mWNKLSXci48m7cctATKfLlQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    
+    <script>
+        document.querySelector('#detailClaim').addEventListener('click', function() {
+            fetch('/claim_card', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ card_id: this.dataset.card }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Карта доавлена!');
+                window.location.replace('/');
+            })
+            .catch(error => {
+                console.error('Ошибка при отправке данных:', error);
+            });
+        })
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.tab');
+            const tabIndicator = document.querySelector('.tab-indicator');
+            const cardContainers = document.querySelectorAll('.card-container');
+        
+            function updateIndicator(tab) {
+                const tabRect = tab.getBoundingClientRect();
+                const parentRect = tab.parentElement.getBoundingClientRect();
+
+                const tabWidth = tabRect.width;
+                const tabLeft = tabRect.left - parentRect.left;
+
+                tabIndicator.style.width = `${tabWidth}px`;
+                tabIndicator.style.left = `${tabLeft}px`;
+            }
+        
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Снимаем класс 'active' со всех вкладок
+                    tabs.forEach(t => t.classList.remove('active'));
+                    // Добавляем класс 'active' к выбранной вкладке
+                    this.classList.add('active');
+        
+                    // Обновляем позицию индикатора
+                    updateIndicator(this);
+        
+                    // Скрываем все контейнеры карточек
+                    cardContainers.forEach(container => {
+                        container.classList.remove('active');
+                        container.classList.add('none');
+                    });
+                    // Отображаем связанный контейнер
+                    const tabName = this.getAttribute('data-tab');
+                    document.getElementById(tabName).classList.add('active');
+                    document.getElementById(tabName).classList.remove('none');
+
+                });
+            });
+        
+            // Инициализируем позицию индикатора при загрузке страницы
+            const initialTab = document.querySelector('.tab.active');
+            if (initialTab) {
+                updateIndicator(initialTab);
+            }
+        });
+    </script>
     <script>
        window.onload = function () {
             const qrPopup = document.getElementById('qr-popup');
@@ -208,6 +232,7 @@
                     console.log(data);
                     closePopup();
                     alert('QR-код успешно отправлен на сервер!');
+                    window.location.replace('/');
                 })
                 .catch(error => {
                     console.error('Ошибка при отправке данных:', error);
@@ -243,29 +268,30 @@
                 const cardLevel = parseInt(levelElement.innerText, 10);
                 const cardExp = parseInt(expElement.innerText, 10);
                 
-                const cardSum = cardExp * cardLevel;
+                const cardSum = cardExp;
                 expElement.innerText = cardSum;
                 expSum += cardSum;
             });
-            console.log('!'+expSum);
             fillExpBar(expSum);
         });
     </script>
     <script>
         function fillExpBar(experience) {
-            console.log(experience);
             const progressBarFill = document.querySelector('.progress-fill');
-            const maxExperience = 200; // Example maximum experience points
+            const maxExperience = parseInt(100 * Math.pow(3, <%= user.lvl %> - 1)); // Example maximum experience points
             const progressPercentage = (experience / maxExperience) * 100;
             progressBarFill.style.width = progressPercentage + '%';
+            console.log(experience + '/' + maxExperience);
         }
     </script>
     <script>
         function showDetails(card) {
+            console.log(card);
             document.getElementById('detailTitle').textContent = card.querySelector('#card-title').innerText;
             document.getElementById('detailDescription').textContent = card.querySelector('#card-description').innerText;
             document.getElementById('detailImage').src = card.querySelector('#card-image').src;
             document.getElementById('detailsPanel').classList.add('active');
+            document.getElementById('detailClaim').dataset.card = card.dataset.card;
         }
 
         function hideDetails() {

@@ -24,6 +24,7 @@ module.exports = (sequelize, DataTypes) => {
     shortDesc: DataTypes.STRING,
     fullDesc: DataTypes.STRING,
     baseExp: DataTypes.FLOAT,
+    rarity: DataTypes.CHAR,
     basePrice: DataTypes.FLOAT,
     imgSrc: DataTypes.STRING
   }, {

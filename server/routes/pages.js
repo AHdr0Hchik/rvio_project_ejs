@@ -9,6 +9,9 @@ router.get('/', pageController.index);
 
 router.post('/scan', pageController.scan);
 
+router.post('/claim_card', pageController.claim_card);
+
+router.post('/get_events', pageController.get_events);
 
 
 module.exports = router;
