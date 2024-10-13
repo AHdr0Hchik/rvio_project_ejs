@@ -2,11 +2,7 @@ const path = require('path');
 //const User = require('../classes/User');
 //const MailService = require('../classes/MailService');
 const bcrypt = require('bcryptjs');
-<<<<<<< HEAD
-const {User, Cards, users_cards, Events} = require('../sequelize/models');
-=======
 const {User, Cards, users_cards, Events, Event_participants} = require('../sequelize/models');
->>>>>>> 0799346 (3rd commit)
 const {Op, where} = require('sequelize');
 const jwt = require('jsonwebtoken');
 const QRCode = require('qrcode');
@@ -78,7 +74,7 @@ exports.index = async (req, res) => {
         };
         
         // Пример использования
-        const cardId = '1';
+        const cardId = '8';
         const level = '1';
         const expiryDate = new Date(); // Установите нужную дату истечения
         expiryDate.setDate(expiryDate.getDate() + 7); // Плюс 7 дней
@@ -111,8 +107,8 @@ exports.scan = async (req, res) => {
             await users_cards.create({
                 user_id: userData.user_id,
                 card_id: card.id,
-                card_lvl: qrData.level,
-                card_exp: card.baseExp*parseInt(qrData.level)
+                card_lvl: qrData.levelIncrease,
+                card_exp: card.baseExp*parseInt(qrData.levelIncrease)
             });
         } else {
             await users_cards.update({
@@ -164,17 +160,7 @@ exports.claim_card = async (req, res) => {
 }
 
 exports.get_events = async (req, res) => {
-<<<<<<< HEAD
-    const events = await Events.findAll();
-
-    return events, res.status(200);
-=======
     try {
-        const events = await Events.findAll({
-            where: {
-                date: {[Op.gt]: new Date() }
-            }
-        });
 
         const eventParticipants = await Event_participants.findAll({
             include: [{
@@ -182,8 +168,20 @@ exports.get_events = async (req, res) => {
               as: 'event'
             }]
         });
+
+        const eventIds = eventParticipants.map(ep => ep.event_id);
+
+        // Получаем события, которые происходят в будущем, исключая те, что есть в eventParticipants
+        const events = await Events.findAll({
+            where: {
+                date: { [Op.gt]: new Date() },
+                id: { [Op.notIn]: eventIds } // Исключаем события, которые уже есть у участников
+            }
+        });
+        
+        const participatedEvents = eventParticipants.map(ep => ep.event);
         console.log(eventParticipants);
-        return res.json(JSON.stringify(events)).status(200);
+        return res.json({events: events, my_events: participatedEvents}).status(200);
     } catch(e) {
         console.log(e);
         return res.redirect('/');
@@ -226,7 +224,6 @@ exports.to_participate = async (req, res) => {
         console.log(e);
         return res.json({'message' : 'Ошибка'}).status(500);
     }
->>>>>>> 0799346 (3rd commit)
 }
 
 

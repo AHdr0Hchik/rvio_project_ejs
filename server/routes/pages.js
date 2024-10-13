@@ -12,13 +12,11 @@ router.post('/scan', pageController.scan);
 router.post('/claim_card', pageController.claim_card);
 
 router.post('/get_events', pageController.get_events);
-<<<<<<< HEAD
-=======
 
 router.post('/get_reward', pageController.get_reward);
 
 router.post('/to_participate', pageController.to_participate);
->>>>>>> 0799346 (3rd commit)
+
 
 
 module.exports = router;
