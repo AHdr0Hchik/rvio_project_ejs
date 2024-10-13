@@ -58,7 +58,7 @@ exports.index = async (req, res) => {
         });
 
 
-        /*const generateQRCode = async (cardId, level, expiryDate) => {
+        const generateQRCode = async (cardId, level, expiryDate) => {
             try {
                 const data = {
                     id: cardId,
@@ -74,14 +74,14 @@ exports.index = async (req, res) => {
         };
         
         // Пример использования
-        const cardId = '1';
+        const cardId = '8';
         const level = '1';
         const expiryDate = new Date(); // Установите нужную дату истечения
         expiryDate.setDate(expiryDate.getDate() + 7); // Плюс 7 дней
         
         generateQRCode(cardId, level, expiryDate).then(qrCodeDataURL => {
             console.log(qrCodeDataURL); // Это будет Data URL для изображения QR-кода
-        });*/
+        });
 
 
         return res.render(createPath('main'), {user, availableCards: availableCards, userCards: mergedCards});  
@@ -107,8 +107,8 @@ exports.scan = async (req, res) => {
             await users_cards.create({
                 user_id: userData.user_id,
                 card_id: card.id,
-                card_lvl: qrData.level,
-                card_exp: card.baseExp*parseInt(qrData.level)
+                card_lvl: qrData.levelIncrease,
+                card_exp: card.baseExp*parseInt(qrData.levelIncrease)
             });
         } else {
             await users_cards.update({
@@ -161,11 +161,6 @@ exports.claim_card = async (req, res) => {
 
 exports.get_events = async (req, res) => {
     try {
-        const events = await Events.findAll({
-            where: {
-                date: {[Op.gt]: new Date() }
-            }
-        });
 
         const eventParticipants = await Event_participants.findAll({
             include: [{
@@ -173,8 +168,20 @@ exports.get_events = async (req, res) => {
               as: 'event'
             }]
         });
+
+        const eventIds = eventParticipants.map(ep => ep.event_id);
+
+        // Получаем события, которые происходят в будущем, исключая те, что есть в eventParticipants
+        const events = await Events.findAll({
+            where: {
+                date: { [Op.gt]: new Date() },
+                id: { [Op.notIn]: eventIds } // Исключаем события, которые уже есть у участников
+            }
+        });
+        
+        const participatedEvents = eventParticipants.map(ep => ep.event);
         console.log(eventParticipants);
-        return res.json(JSON.stringify(events)).status(200);
+        return res.json({events: events, my_events: participatedEvents}).status(200);
     } catch(e) {
         console.log(e);
         return res.redirect('/');
