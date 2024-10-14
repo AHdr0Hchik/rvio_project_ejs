@@ -58,7 +58,7 @@ exports.index = async (req, res) => {
         });
 
 
-        const generateQRCode = async (cardId, level, expiryDate) => {
+        /*const generateQRCode = async (cardId, level, expiryDate) => {
             try {
                 const data = {
                     id: cardId,
@@ -81,7 +81,7 @@ exports.index = async (req, res) => {
         
         generateQRCode(cardId, level, expiryDate).then(qrCodeDataURL => {
             console.log(qrCodeDataURL); // Это будет Data URL для изображения QR-кода
-        });
+        });*/
 
 
         return res.render(createPath('main'), {user, availableCards: availableCards, userCards: mergedCards});  
