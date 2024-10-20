@@ -11,6 +11,16 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      User.belongsToMany(models.Communities, {
+        through: 'User_communities',
+        as: 'communities',
+        foreignKey: 'userId'
+      });
+
+      User.hasMany(models.users_cards, {
+        as: 'cards',
+        foreignKey: 'user_id'
+      });
     }
   }
   User.init({
@@ -23,6 +33,7 @@ module.exports = (sequelize, DataTypes) => {
     firstName: DataTypes.STRING,
     lastName: DataTypes.STRING,
     email: DataTypes.STRING,
+    imgSrc: DataTypes.STRING,
     passwordHash: DataTypes.STRING,
     lvl: DataTypes.INTEGER,
     totalExp: DataTypes.INTEGER

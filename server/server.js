@@ -71,11 +71,6 @@ app.use('/scripts',express.static(__dirname + '/../public/scripts'));
 app.use('/fonts',express.static(__dirname + '/../public/fonts'));
 //app.use('/templates', express.static(__dirname + '/../public/templates'));
 
-//mobile
-
-app.use('/mobile_pos/styles',express.static(__dirname + '/../public/mobile_pos/styles'));
-app.use('/mobile_pos/scripts',express.static(__dirname + '/../public/mobile_pos/scripts'));
-app.use('/mobile_pos/img',express.static(__dirname + '/../public/mobile_pos/img'));
 
 
 app.listen(process.env.PORT ,() => {
@@ -83,7 +78,8 @@ app.listen(process.env.PORT ,() => {
 });
 
 app.use('/auth', require('./routes/auth'));
-app.use('/', authMiddleware , require('./routes/pages'));
+app.use('/communities', authMiddleware, require('./routes/communities'));
+app.use('/', authMiddleware, require('./routes/pages'));
 //app.use('/order', require('./routes/order'));
 //app.use('/mobile', authMiddleware, roleMiddleware, require('./routes/mobile'));
 //app.use('/admin', authMiddleware, roleMiddleware, require('./routes/admin'));

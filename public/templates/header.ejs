@@ -17,9 +17,13 @@
     </script>
     <div>
         <% if(locals.user) { %>
-            <img class="header-img" src="/img/user/avatar.jpg" alt="Profile">
+            <img class="header-img" src="<%= user.imgSrc %>" alt="Profile">
             <div class="user-data" style="margin-left: 5px;">
-                <strong style="display: block; margin-bottom: 5px;"><%= user.firstName %> <%= user.lastName %> (CEO)</strong>
+                <strong style="display: block; margin-bottom: 5px;"><span id="user_name"><%= user.firstName %> <%= user.lastName %></span> 
+                    <% if(user.communities.length>0) { %>
+                        <span id="user_community">(<%= user.communities[0].name %>)</span>
+                    <% } %>
+                </strong>
                 <div class="progress" style="display: flex;">
                     <div class="progress-bar">
                         <div class="progress-fill" style="width: 75%;"></div>

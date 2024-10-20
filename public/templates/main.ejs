@@ -51,15 +51,18 @@
         <div class="tabs">
             <div class="tab active" data-tab="my_cards" id="my_cards_tab">Мои карточки</div>
             <div class="tab" data-tab="new_cards" id="new_cards_tab">Новые карточки</div>
-            <div class="tab" data-tab="missed_cards" id="missed_cards_tab">Упущенные карточки</div>
             <div class="tab none" data-tab="my_events" id="my_events_tab">Мои события</div>
             <div class="tab none" data-tab="new_events" id="new_events_tab">Новые события</div>
+            <div class="tab none" data-tab="my_tasks" id="my_tasks_tab">Мои задания</div>
+            <div class="tab none" data-tab="new_tasks" id="new_tasks_tab">Новые задания</div>
+            <div class="tab none" data-tab="my_community" id="my_community_tab">Моё сообщество</div>
+            <div class="tab none" data-tab="new_communities" id="new_communities_tab">Сообщества</div>
             <div class="tab-indicator"></div>
         </div>
         <div id="dynamic-content">
             <div class="card-container" id="my_cards">
                 <% userCards.forEach(card => { %>
-                    <div class="card" data-card="<%= card.id %>" data-type="my" onclick="showDetails(this, 'default_card')">
+                    <div class="card bg-<%= card.rarity %>" data-card="<%= card.id %>" data-type="my" onclick="showDetails(this, 'default_card')">
                         <img src="<%= card.imgSrc %>" alt="Card Image" id="card-image">
                         <p><strong id="card-title"><%= card.name %></strong><br><%= card.shortDesc %></p>
                         <p id="card-description" hidden><%= card.fullDesc %></p>
@@ -72,7 +75,7 @@
             </div>
             <div class="card-container none" id="new_cards">
                 <% availableCards.forEach(card => { %>
-                    <div class="card" data-card="<%= card.id %>" data-type="new" onclick="showDetails(this, 'default_card')">
+                    <div class="card bg-<%= card.rarity %>" data-card="<%= card.id %>" data-type="new" onclick="showDetails(this, 'default_card')">
                         <img src="<%= card.imgSrc %>" alt="Card Image" id="card-image">
                         <p><strong id="card-title"><%= card.name %></strong><br><%= card.shortDesc %></p>
                         <p id="card-description" hidden><%= card.fullDesc %></p>
@@ -90,19 +93,19 @@
         <!-- Модальное окно -->
         <div id="qr-popup" class="popup">
             <div class="popup-content">
-                <span class="close-btn" id="close-popup">&times;</span>
+                <span class="close-btn" id="close-popup">&amp;times;</span>
                 <h2>Сканировать QR-код</h2>
                 <div id="qr-reader" style="width: 100%"></div>
                 <div id="qr-reader-results"></div>
             </div>
         </div>
-        <div class="details-panel" id="cardDetailsPanel">
+        <div class="details-panel" id="cardDetailsPanel" style="z-index: 1005;">
             <span class="close-btn" onclick="hideDetails()">×</span>
             <img src="https://via.placeholder.com/300x150" alt="Detail Image" id="detailImage">
             <h2 id="detailTitle">Я успеваю сделать все</h2>
             <p id="detailDescription">Передвигаюсь по городу без пробок и не ищу заправки</p>
             <!-- <br>
-            <div class="details-footer" id="detailClaim" data-card="">Получить</div> -->
+            <div class="details-footer" id="detailClaim" data-card=">Получить</div> -->
         </div>
         <div class="details-panel" id="eventsDetailsPanel">
             <span class="close-btn" onclick="hideDetails()">×</span>
@@ -113,183 +116,441 @@
             <br>
             <button style="background-color: #878792; border: none; border-radius: 20px; height: 60px; width: 180px; color: white; font-size: 24px" class='btn-participate' id="btn-participate" data-event="">Участвовать</button>
         </div>
+        <div class="details-panel" id="tasksDetailsPanel">
+            <span class="close-btn" onclick="hideDetails()">×</span>
+            <img onclick="" src="https://via.placeholder.com/300x150" alt="Detail Image" id="detailImage">
+            <h1 id="detailTitle"></h1>
+            <br>
+            <p style="text-align: justify; margin: 15px; overflow-y: auto; max-height: 20vh; line-height: 20px" id="detailDescription"></p>
+            <br>
+            <button style="background-color: #878792; border: none; border-radius: 20px; height: 60px; width: 180px; color: white; font-size: 24px" class='btn-participate' id="btn-participate" data-event="">Участвовать</button>
+        </div>
+        <div class="details-panel" id="userDetailsPanel">
+            <span class="close-btn" onclick="hideDetails()">×</span>
+            <h1 id="detailTitle">Карточка игрока</h1>
+            <div class="header">
+                <div> 
+                        <img class="header-img" src="/img/user/avatar.jpg" alt="Profile" id="user_avatar">
+                        <div class="user-data" style="margin-left: 5px;">
+                            <strong style="display: block; margin-bottom: 5px;"><span id="user_name">Андрей Хоменко</span> 
+                                    <span id="user_community">(РВИО по ДНР)</span>
+                            </strong>
+                            <div class="progress" style="display: flex;">
+                                <span> <span id="user_lvl">NaN</span> ур.</span>
+                                <!-- <img src="/img/ui/general_rank.png" alt="Генерал" style="display: block; max-height: 15px; width: auto; border: none; margin-left: 5px;"> -->
+                            </div>
+                        </div>
+                </div>
+            </div>
+            <div class="user-card-container" id="user_cards" style="max-height: 410px; overflow-y: auto;">
+
+            </div>
+            <br>
+            <p style="text-align: justify; margin: 15px; overflow-y: auto; max-height: 20vh; line-height: 20px" id="detailDescription"></p>
+        </div>
     </div>
     <div id="popup">Вы записаны на участие в событии!</div>
     <%- include('footer') %>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.4/html5-qrcode.min.js" integrity="sha512-k/KAe4Yff9EUdYI5/IAHlwUswqeipP+Cp5qnrsUjTPCgl51La2/JhyyjNciztD7mWNKLSXci48m7cctATKfLlQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    
-    <!-- Значения кнопок апбара -->
+
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Инициализация переключателей вкладок и кнопок
+            document.querySelector('#btn_cards').addEventListener('click', () => handleTabSwitch('main_page'));
+            document.querySelector('#btn_events').addEventListener('click', () => handleTabSwitch('events_page'));
+            document.querySelector('#btn_tasks').addEventListener('click', () => handleTabSwitch('tasks_page'));
+            document.querySelector('#btn_my_community').addEventListener('click', () => handleTabSwitch('my_community'));
+            
+    
+            // Общая обработка кликов по участию
+            document.addEventListener('click', handleParticipationClick);
+            document.addEventListener('click', getMemberInfo)
+    
+            // Инициализация индикатора вкладок
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.addEventListener('click', () => handleTabClick(tab)));
+        });
+    
+        // Обработка переключения вкладок и загрузки данных
         const upbar_tabs_id = {
             main: ['my_cards_tab', 'new_cards_tab', 'missed_cards_tab'],
-            events: ['my_events_tab', 'new_events_tab']
+            events: ['my_events_tab', 'new_events_tab'],
+            tasks: ['my_tasks_tab', 'new_tasks_tab'],
+            my_community: ['my_community_tab'],
+            communities: ['new_communities_tab']
         };
-    </script>
+        const config = {
+            main_page: {
+                activeButton: '#btn_cards',
+                endpoint: '/get_cards',
+                upbarTabs: upbar_tabs_id.main,
+                myItemsKey: 'my_cards',
+                newItemsKey: 'availableCards',
+                myTab: '#my_cards_tab',
+                itemType: 'cards',
+                createCardFunction: createDefaultCard
+            },
+            events_page: {
+                activeButton: '#btn_events',
+                endpoint: '/get_events',
+                upbarTabs: upbar_tabs_id.events,
+                myItemsKey: 'my_events',
+                newItemsKey: 'events',
+                myTab: '#my_events_tab',
+                itemType: 'events',
+                createCardFunction: createEventCard
+            },
+            tasks_page: {
+                activeButton: '#btn_tasks',
+                endpoint: '/get_tests',
+                upbarTabs: upbar_tabs_id.tasks,
+                myItemsKey: 'my_tasks',
+                newItemsKey: 'new_tasks',
+                myTab: '#my_tasks_tab',
+                itemType: 'tasks',
+                createCardFunction: createTaskCard
+            },
+            my_community: {
+                activeButton: '#btn_my_community',
+                endpoint: '/communities/render_communities',
+                upbarTabs: upbar_tabs_id.my_community,
+                myItemsKey: 'my_community',
+                myTab: '#my_community_tab',
+                itemType: 'my_community',
+                createCardFunction: createMyCommunityCard
+            },
+            new_communities: {
+                activeButton: '#btn_new_communities',
+                endpoint: '/communities/render_communities',
+                upbarTabs: upbar_tabs_id.communities,
+                myItemsKey: 'communities',
+                newItemsKey: 'new_communities',
+                myTab: '#new_communities_tab',
+                itemType: 'communities',
+                createCardFunction: createMyCommunityCard
+            }
+        };
+        function handleTabSwitch(section) {
+            const { activeButton, endpoint, upbarTabs, myTab } = config[section] || {};
 
-    <!-- Принять участие в событии -->
-    <script>
-        document.addEventListener('click', function(event) {
-            if(event.target.id=='btn-participate') {
-                console.log(123);
+            if (!activeButton || !endpoint || !upbarTabs) {
+                console.error('Invalid section configuration');
+                return;
+            }
+    
+            const prevActiveBtn = document.querySelector('.footer').querySelector('.active');
+
+            if(document.querySelector(activeButton).classList.contains('active')) return;
+            if(prevActiveBtn) { prevActiveBtn.classList.remove('active'); }
+    
+            fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    document.querySelector(activeButton).classList.add('active');
+                    updateTabsVisibility(upbarTabs, myTab);
+
+                    renderContent(section, data);
+                })
+                .catch(error => {
+                    console.error('Ошибка при загрузке данных:', error);
+                });
+        }
+    
+        // Обновление видимости вкладок
+        function updateTabsVisibility(visibleTabs, myTab) {
+            const tabs = document.querySelectorAll('.tabs .tab');
+            tabs.forEach(tab => {
+                tab.classList.toggle('none', !visibleTabs.includes(tab.id));
+            });
+            const activeTab = document.querySelector(myTab);
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            activeTab.classList.add('active');
+            updateIndicator(activeTab);
+        }
+    
+        // Рендеринг карточек или событий
+        function renderContent(section, data) {
+            const dynamicContent = document.querySelector('#dynamic-content');
+            dynamicContent.innerHTML = ''; // Clear previous content
+
+            if(section == 'my_community') {
+                const { myItemsKey } = config[section] || {};
+                const myItems = data[myItemsKey];
+                return createCardContainer(myItems, 'my', section);
+            } else if( section == 'new_communities') {
+                const { newItemsKey } = config[section] || {};
+                const newItems = data[newItemsKey];
+                return createCardContainer(newItems, 'my', section);
+            }
+            const { myItemsKey, newItemsKey, myTab } = config[section] || {};
+
+            const myItems = data[myItemsKey];
+            const newItems = data[newItemsKey];
+
+            if (!myItems || !myTab) {
+                console.error('Invalid section data');
+                return;
+            }
+
+            createCardContainer(myItems, 'my', section);
+            createCardContainer(newItems, 'new', section);
+
+            
+        }
+    
+        // Создание контейнера карточек
+        function createCardContainer(items, type, section) {
+            const { itemType, createCardFunction } = config[section] || {};
+
+            if (!itemType || !createCardFunction) {
+                console.error('Invalid section configuration');
+                return;
+            }
+
+            const container = document.createElement('div');
+            container.className = 'card-container';
+            container.id = `${type}_${itemType}`;
+            container.classList.toggle('none', type === 'new');
+
+            if(!Array.isArray(items)) {
+                const cardElement = createCardFunction(items, type);
+                container.appendChild(cardElement);
+            } else {
+                items.forEach(item => {
+                    const cardElement = createCardFunction(item, type);
+                    container.appendChild(cardElement);
+                });
+            }
+            
+            if(itemType=='tasks') {
+                const testModal = document.createElement('div');
+                testModal.className = 'modal';
+                testModal.id = 'testModal';
+                testModal.style.display = 'none'
+                testModal.innerHTML = `
+                <div class="modal-content">
+                    <span id="closeModal" class="close">&times;</span>
+                    <div class="game-details-container">
+                        <h1>Очков : <span id="player-score"></span> / 10</h1>
+                        <h1> Вопрос : <span id="question-number"></span> / 10</h1>
+                    </div>
+                    <div id="questionContent"></div>
+                    <div class="next-button-container">
+                        <button id="nextQuestion" style="display:none;" onclick="nextQuestion()">Следующий вопрос</button>
+                        <button id="finishTest" style="display:none;" onclick="finishTest()">Завершить тест</button>
+                    </div>
+                </div>
+                `;
+                document.querySelector('#dynamic-content').appendChild(testModal);
+            }
+            document.querySelector('#dynamic-content').appendChild(container);
+        }
+    
+        // Создание карточки
+        function createDefaultCard(card, type) {
+            const cardDiv = document.createElement('div');
+            cardDiv.className = `card`;
+            cardDiv.classList.add(`bg-${card.rarity}`);
+            cardDiv.dataset.card = card.id;
+            cardDiv.dataset.type = type;
+            cardDiv.setAttribute('onclick', 'showDetails(this, "default_card")');
+    
+            cardDiv.innerHTML = `
+                <img id="card-image" src="${card.imgSrc}" alt="Card Image">
+                <p><strong id="card-title">${card.name}</strong><br>${card.shortDesc}</p>
+                <p id="card-description" hidden>${card.fullDesc}</p>
+                <div class="card-footer">
+                    ${type === 'my' ? `<div>${card.card_lvl} ур.</div><div>+${card.card_exp} опыта</div>` : ''}
+                </div>
+            `;
+            return cardDiv;
+        }
+    
+        // Создание карточки события
+        function createEventCard(event, type) {
+            const eventDiv = document.createElement('div');
+            eventDiv.className = 'card';
+            eventDiv.dataset.card = event.id;
+            eventDiv.dataset.type = type;
+            eventDiv.dataset.reward = event.reward_id;
+            eventDiv.setAttribute('onclick', 'showDetails(this, "event_card")');
+    
+            eventDiv.innerHTML = `
+                <img id="card-image" src="${event.imgSrc}" alt="Event Image">
+                <p><strong id="card-title">${event.name}</strong></p>
+                <p id="card-description" hidden>${event.description}</p>
+                <div class="card-footer">
+                    <div>${event.address}</div>
+                    <div>${new Date(event.date).toLocaleString('ru-RU', {
+                        year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'UTC'
+                    })}</div>
+                </div>
+            `;
+            return eventDiv;
+        }
+        
+        function createTaskCard(task, type) {
+            const taskDiv = document.createElement('div');
+            taskDiv.className = 'card';
+            taskDiv.dataset.card = task.id;
+            taskDiv.dataset.type = type;
+            //taskDiv.setAttribute('onclick', 'showDetails(this, "task_card")');
+    
+            taskDiv.innerHTML = `
+                <p><strong id="card-title">${task.title}</strong></p>
+                <p id="card-description">${task.description}</p>
+                <div class="card-footer">
+                    <p>Количество вопросов: <span id='card-questions_count'>${task.questionCount}</span></p>
+                    <button id="start_task" onclick="getAndStartTest(${task.id})">Начать тест</button>
+                </div>
+            `;
+            return taskDiv;
+        }
+
+        function createCommunitiesCard() {
+
+        }
+
+        function createMyCommunityCard(community, type) {
+            const communityDiv = document.createElement('div');
+            communityDiv.className = 'card';
+            communityDiv.dataset.card = community.id;
+            communityDiv.dataset.type = type;
+            communityDiv.dataset.reward = community.reward_id;
+            communityDiv.setAttribute('onclick', 'showDetails(this, "community_card")');
+            let members = '';
+            if(community.members) {
+                community.members.forEach(member => {
+                    members+= `<p class='community-member' data-user="${member.id}">${member.firstName} ${member.lastName}</p>`;
+                });
+            } else {
+                members = 'Чтобы посмотреть участников, нужно вступить в сообщество.'
+            }
+            
+            communityDiv.innerHTML = `
+                <p><strong id="card-title">${community.name}</strong></p>
+                <p id="card-description">${community.description}</p>
+                <div class="card-footer">
+                    <div style="display: flex; flex-direction: column;">
+                        <h2 style="margin: 10px 0 2px 0 !important; font-weight: 600;">Участники</h2>
+                        ${members}
+                    </div>
+                </div>
+            `;
+            return communityDiv;
+        }
+
+        // Обработка кликов по участию в событиях
+        function handleParticipationClick(event) {
+            if (event.target.id === 'btn-participate') {
                 const event_id = event.target.dataset.event;
-                    fetch('/to_participate', {
+                fetch('/to_participate', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ event_id: event_id }),
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ event_id })
                 })
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data.message);
                     document.querySelector('.details-panel.active').classList.remove('active');
-
-                    // Находим карточку мероприятия
-                    const eventCard = document.querySelector(`.card[data-card="${event_id}"]`);
-                    if (eventCard) {
-                        // Удаляем карточку из new_events
-                        const newEventsContainer = document.getElementById('new_events');
-                        newEventsContainer.removeChild(eventCard);
-                        
-                        // Добавляем карточку в my_events
-                        const myEventsContainer = document.getElementById('my_events');
-                        myEventsContainer.appendChild(eventCard);
-                        
-                        // Меняем атрибут data-type
-                        eventCard.setAttribute('data-type', 'my');
-                        // Если new_events пуст, скрываем его
-                        if (newEventsContainer.children.length === 0) {
-                            newEventsContainer.classList.add('none');
-                        }
-                        
-                        // Показываем my_events, если он был скрыт
-                        myEventsContainer.classList.remove('none');
-                        myEventsContainer.classList.add('active');
-                        const my_events_tab = document.querySelector('#my_events_tab');
-                        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                        my_events_tab.classList.add('active');
-                        updateIndicator(my_events_tab);
-
-                        // Show the popup
-                        const popup = document.getElementById('popup');
-                        popup.style.display = 'block';
-                        setTimeout(() => {
-                            popup.style.display = 'none';
-                        }, 3000);
-                    }
+                    moveEventCard(event_id);
+                    showPopup('Вы записаны на участие в событии!');
                 })
                 .catch(error => {
                     console.error('Ошибка при отправке данных:', error);
                 });
             }
-        });
-    </script>
-    <!-- Рендер событий -->
-    <script>
-        function createCard(event, type) {
-            const eventDiv = document.createElement('div');
-            eventDiv.className = 'card';
-            eventDiv.dataset.card = event.id;
-            eventDiv.dataset.reward = event.reward_id;
-            eventDiv.dataset.type = type
-            eventDiv.setAttribute('onclick', 'showDetails(this, "event_card")');
-            //eventDiv.onclick = function() { showDetails(this); };
-
-            eventDiv.innerHTML = `
-                <img id="card-image" src="${event.imgSrc}" alt="Card Image">
-                <p><strong id="card-title" >${event.name}</strong>
-                <p id="card-description" hidden>${event.description}</p>
-                <div class="card-footer">
-                    <div><span class="current-level">${event.address}</span></div>
-                    <div><span class="current-exp">${new Date(event.date).toLocaleString('ru-RU', {year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'UTC'})}</span></div>
-                </div>
-            `;
-
-            return eventDiv;
         }
 
-        function createCardContainer(eventsCards, type) {
-            const container = document.createElement('div');
-            container.className = 'card-container';
-            if(type=='my') {
-                container.id = 'my_events';
-                //container.classList.add('active');
-            } else if(type=='new') {
-                container.id = 'new_events';
-                container.classList.add('none');
-            }
-            
-
-            eventsCards.forEach(event => {
-                const eventElement = createCard(event, type);
-                container.appendChild(eventElement);
-            });
-
-            document.querySelector('#dynamic-content').appendChild(container);
-            
-        }
-
-        document.querySelector('#btn_events').addEventListener('click', function(event) {
-            if(event.target.classList.contains('active')) { return };
-
-            fetch('/get_events', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            }).then(response => response.json())
-            .then(data => {
-                event.target.classList.add('active');
-                const dynamic_content = document.querySelector('#dynamic-content');
-
-                const upbar = document.querySelector('.tabs');
-                const tabs = upbar.querySelectorAll('.tab');
-
-                tabs.forEach(tab => {
-                    if(upbar_tabs_id.events.includes(tab.id)) {
-                        if(tab.classList.contains('none')) {
-                            tab.classList.remove('none');
-                        }
-                    } else {
-                        if(!tab.classList.contains('none')) {
-                            tab.classList.add('none');
-                        }
-                    }
+        function getMemberInfo(event) {
+            if(event.target.classList.contains('community-member')) {
+                fetch('/get_user', {
+                    method: 'POST',
+                    headers: { 'Content-Type' : 'application/json' },
+                    body: JSON.stringify({user_id: event.target.dataset.user})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    showDetails(data, 'user_card')
+                })
+                .catch(error => {
+                    console.error('Ошибка при отправке данных:', error);
                 });
-
-                dynamic_content.innerHTML = '';
-                createCardContainer(data.my_events, 'my');
-                createCardContainer(data.events, 'new');
-                const my_events_tab = document.querySelector('#my_events_tab');
+            }
+        }
+    
+        // Перемещение карточки события после записи на участие
+        function moveEventCard(event_id) {
+            const eventCard = document.querySelector(`.card[data-card="${event_id}"]`);
+            const newEventsContainer = document.getElementById('new_events');
+            const myEventsContainer = document.getElementById('my_events');
+    
+            if (eventCard) {
+                newEventsContainer.removeChild(eventCard);
+                myEventsContainer.appendChild(eventCard);
+                eventCard.setAttribute('data-type', 'my');
+    
+                if (!newEventsContainer.children.length) {
+                    newEventsContainer.classList.add('none');
+                }
+    
+                myEventsContainer.classList.remove('none');
+    
+                const myEventsTab = document.querySelector('#my_events_tab');
                 document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                my_events_tab.classList.add('active');
-                updateIndicator(document.getElementById('my_events_tab'));
-            })
-            .catch(error => {
-                console.error('Ошибка при отправке данных:', error);
-            });
-        });
-     </script>
+                myEventsTab.classList.add('active');
+                updateIndicator(myEventsTab);
+            }
+        }
 
-    <!-- Получение карточки -->
-    <script>
-        document.querySelector('#detailClaim').addEventListener('click', function() {
-            fetch('/claim_card', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ card_id: this.dataset.card }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Карта доавлена!');
-                window.location.replace('/');
-            })
-            .catch(error => {
-                console.error('Ошибка при отправке данных:', error);
-            });
-        })
+        function moveTaskCard(task_id) {
+            const taskCard = document.querySelector(`.card[data-card="${task_id}"]`);
+            const newTasksContainer = document.getElementById('new_tasks');
+            const myTasksContainer = document.getElementById('my_tasks');
+    
+            if (taskCard) {
+                newTasksContainer.removeChild(taskCard);
+                myTasksContainer.appendChild(taskCard);
+                taskCard.dataset.type = 'my'
+    
+                if (!newTasksContainer.children.length) {
+                    newTasksContainer.classList.add('none');
+                }
+    
+                myTasksContainer.classList.remove('none');
+    
+                const myTasksTab = document.querySelector('#my_tasks_tab');
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                myTasksTab.classList.add('active');
+                updateIndicator(myTasksTab);
+            }
+        }
+    
+        // Показ уведомления
+        function showPopup(message) {
+            const popup = document.getElementById('popup');
+            popup.textContent = message;
+            popup.style.display = 'block';
+            setTimeout(() => popup.style.display = 'none', 3000);
+        }
+    
+        // Обновление индикатора вкладок
+        function updateIndicator(tab) {
+            const tabRect = tab.getBoundingClientRect();
+            const parentRect = tab.parentElement.getBoundingClientRect();
+            const tabIndicator = document.querySelector('.tab-indicator');
+    
+            tabIndicator.style.width = `${tabRect.width}px`;
+            tabIndicator.style.left = `${tabRect.left - parentRect.left}px`;
+        }
+    
+        // Обработка кликов по вкладкам
+        function handleTabClick(tab) {
+            const cardContainers = document.querySelectorAll('.card-container');
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            updateIndicator(tab);
+        }
     </script>
 
     <!-- Подводка под кнопками  -->
@@ -343,7 +604,7 @@
 
     <!-- Сканер qr-кодов -->
     <script>
-       window.onload = function () {
+    window.onload = function () {
             const qrPopup = document.getElementById('qr-popup');
             const qrScanButton = document.getElementById('qr_scan');
             const closePopupButton = document.getElementById('close-popup');
@@ -402,7 +663,6 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
                     closePopup();
                     alert('QR-код успешно отправлен на сервер!');
                     window.location.replace('/');
@@ -520,8 +780,29 @@
 
             if (card_type === 'default_card') {
                 detailsPanel = document.querySelector('#cardDetailsPanel');
-            } else if (card_type === 'event_card') {
+            } 
+            else if (card_type === 'event_card') {
                 detailsPanel = document.querySelector('#eventsDetailsPanel');
+            }
+            else if (card_type === 'task_card') {
+                detailsPanel = document.querySelector('#tasksDetailsPanel');
+            }
+            else if(card_type === 'user_card') {
+                detailsPanel = document.querySelector('#userDetailsPanel');
+
+                detailsPanel.querySelector('#user_avatar').src = card.imgSrc;
+                detailsPanel.querySelector('#user_name').innerText = `${card.firstName} ${card.lastName}`;
+                detailsPanel.querySelector('#user_lvl').innerText = card.lvl;
+
+                const card_container = detailsPanel.querySelector('.user-card-container');
+                card.cards.forEach(item => {
+                    const card = createDefaultCard(item.card, 'other');
+                    card_container.appendChild(card);
+                })
+
+
+                detailsPanel.classList.add('active');
+                return;
             }
 
             if (detailsPanel) {
@@ -557,26 +838,132 @@
             document.querySelector('.details-panel.active').classList.remove('active');
         }
     </script>
-
-    <!-- Фоны карточек -->
+    
     <script>
-        const colors = [
-            '#FFB6C1', // Light Pink
-            '#ADD8E6', // Light Blue
-            '#E6E6FA', // Lavender
-            '#F0E68C', // Khaki
-            '#D3D3D3', // Light Gray
-            '#98FB98', // Pale Green
-            '#FFDAB9'  // Peach Puff
-        ];
+        // Прохождение теста
+        // Переменные для отслеживания состояния
+        let currentQuestionIndex = 0;
+        let selectedAnswers = [];
+        let testData = null; // Здесь будут храниться данные теста
 
-        const cards = document.querySelectorAll('.card');
+        // Функция для открытия модального окна
+        function openModal() {
+            document.getElementById('testModal').style.display = 'block';
+            showQuestion(currentQuestionIndex);
+        }
 
-        cards.forEach((card, index) => {
-            const color1 = colors[index % colors.length];
-            const color2 = '#2c2c2e';
-            card.style.background = `linear-gradient(135deg, ${color1}, ${color2})`;
-        });
+        // Функция для закрытия модального окна
+        function closeModal() {
+            document.getElementById('testModal').style.display = 'none';
+            currentQuestionIndex = 0; // Сбрасываем индекс вопросов
+            selectedAnswers = []; // Очищаем ответы
+        }
+
+        // Функция для отображения вопроса и ответов
+        function showQuestion(index) {
+            const questionContent = document.getElementById('questionContent');
+            const question = testData.questions[index];
+            questionContent.innerHTML = `
+                <div class="game-question-container">
+                    <h1 id="display-question">${question.question_text}</h1>
+                </div>
+                <div class="game-options-container">
+                    ${question.Answers.map((answer, index) => `
+                        <span>
+                            <input id="answer-${index}" class="radio" type="radio" name="answer" value="${answer.id}">
+                            <label for="answer-${index}" class="option">${answer.answer_text}</label>
+                        </span>
+                    `).join('')}
+                </div>
+            `;
+
+            // Показывать кнопку "Следующий вопрос" или "Завершить тест"
+            if (index === testData.questions.length - 1) {
+                document.getElementById('nextQuestion').style.display = 'none';
+                document.getElementById('finishTest').style.display = 'block';
+            } else {
+                document.getElementById('nextQuestion').style.display = 'block';
+                document.getElementById('finishTest').style.display = 'none';
+            }
+        }
+
+        // Функция для сохранения выбранного ответа и перехода к следующему вопросу
+        function nextQuestion() {
+            const selectedAnswer = document.querySelector('input[name="answer"]:checked');
+            if (selectedAnswer) {
+                selectedAnswers.push({
+                    question_id: testData.questions[currentQuestionIndex].id,
+                    answer_id: parseInt(selectedAnswer.value)
+                });
+                currentQuestionIndex++;
+                if (currentQuestionIndex < testData.questions.length) {
+                    showQuestion(currentQuestionIndex);
+                }
+            } else {
+                alert('Пожалуйста, выберите ответ!');
+            }
+        }
+
+        // Функция для отправки результатов теста
+        function finishTest() {
+            const selectedAnswer = document.querySelector('input[name="answer"]:checked');
+            if (selectedAnswer) {
+                selectedAnswers.push({
+                    question_id: testData.questions[currentQuestionIndex].id,
+                    answer_id: parseInt(selectedAnswer.value)
+                });
+
+                const payload = {
+                    test_id: testData.id,
+                    answers: selectedAnswers
+                };
+
+                fetch('/submit_test', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    //todo
+                    body: JSON.stringify(payload)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    moveTaskCard(testData.id)
+                    closeModal();
+                })
+                .catch(error => {
+                    console.error('Ошибка при отправке результатов:', error);
+                });
+            } else {
+                alert('Пожалуйста, выберите ответ!');
+            }
+        }
+
+        // Закрытие модального окна при клике на крестик
+        document.getElementById('closeModal').onclick = closeModal;
+
+        // Обработчик для кнопки "Следующий вопрос"
+        document.getElementById('nextQuestion').onclick = nextQuestion;
+
+        // Обработчик для кнопки "Завершить тест"
+        document.getElementById('finishTest').onclick = finishTest;
+
+        // Функция для получения теста и открытия модального окна
+        function getAndStartTest(test_id) {
+            fetch('/get_test', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ test_id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                testData = data;
+                openModal();  // Открываем модальное окно после получения данных
+            })
+            .catch(error => {
+                console.error('Ошибка при получении теста:', error);
+            });
+        }
+        
     </script>
+
 </body>
 </html>

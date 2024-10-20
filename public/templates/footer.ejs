@@ -1,7 +1,13 @@
 <div class="footer">
-    <div onclick="window.location.replace('/')">Главная</div>
-    <div>Кланы</div>
+    <div id="btn_cards">Главная</div>
+    <% if(user.communities.length>0) { %>
+        <div id="btn_my_community">Клан</div>
+        <script>document.querySelector('#btn_my_community').addEventListener('click', () => handleTabSwitch('my_community'));</script>
+    <% } else { %> 
+        <div id="btn_new_communities">Кланы</div>
+        <script>document.querySelector('#btn_new_communities').addEventListener('click', () => handleTabSwitch('new_communities'));</script>
+    <% } %>
     <div class="qr-scan" id="qr_scan"> <img src="/img/ui/qr-scan.png" alt=""></div>
-    <div>Друзья</div>
+    <div id="btn_tasks">Задания</div>
     <div id="btn_events">События</div>
 </div>
