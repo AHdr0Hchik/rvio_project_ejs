@@ -1,13 +1,17 @@
 <div class="footer">
     <div id="btn_cards">Главная</div>
     <% if(user.communities.length>0) { %>
-        <div id="btn_my_community">Клан</div>
+        <div id="btn_my_community" data-page="my_community">Клан</div>
         <script>document.querySelector('#btn_my_community').addEventListener('click', () => handleTabSwitch('my_community'));</script>
-    <% } else { %> 
-        <div id="btn_new_communities">Кланы</div>
+        <div id="btn_new_communities" class="none" data-page="new_communities">Кланы</div>
+        <script>document.querySelector('#btn_new_communities').addEventListener('click', () => handleTabSwitch('new_communities'));</script>
+    <% } else { %>
+        <div id="btn_my_community" class="none" data-page="my_community">Клан</div>
+        <script>document.querySelector('#btn_my_community').addEventListener('click', () => handleTabSwitch('my_community'));</script> 
+        <div id="btn_new_communities" data-page="new_communities">Кланы</div>
         <script>document.querySelector('#btn_new_communities').addEventListener('click', () => handleTabSwitch('new_communities'));</script>
     <% } %>
     <div class="qr-scan" id="qr_scan"> <img src="/img/ui/qr-scan.png" alt=""></div>
-    <div id="btn_tasks">Задания</div>
-    <div id="btn_events">События</div>
+    <div id="btn_tasks" data-page="tasks_page">Задания</div>
+    <div id="btn_events" data-page="events_page">События</div>
 </div>

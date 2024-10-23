@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const path = require('path');
 const { User, refresh_tokens } = require('../sequelize/models');
+const { encrypt } = require('../utils/gostEncoder');
 
 
 const createPath = (page) => path.resolve(__dirname, '../../public/templates/', `${page}.ejs`);
@@ -11,9 +12,13 @@ const createPath = (page) => path.resolve(__dirname, '../../public/templates/', 
 exports.register = async (req, res) => {
     const { firstName, lastName, email, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
-
+    const encrypted_data = {
+        firstName: encrypt(firstName),
+        lastName: encrypt(lastName),
+        email: encrypt(email)
+    }
     try {
-        await User.create({ firstName: firstName, lastName: lastName, email: email, passwordHash: hashedPassword });
+        await User.create({ firstName: encrypted_data.firstName, lastName: encrypted_data.lastName, email: encrypted_data.email, passwordHash: hashedPassword });
         return res.status(201).json({ message: 'User registered!' });
     } catch (error) {
         console.log(error);
@@ -25,9 +30,9 @@ exports.register = async (req, res) => {
 exports.login_post = async (req, res) => {
     console.log(req.body);
     const { email, password } = req.body;
-
+    const encrypted_email = encrypt(email);
     try {
-        const user = await User.findOne({ where: { email } });
+        const user = await User.findOne({ where: { email: encrypted_email } });
 
         if (!user) {
         return res.status(401).json({ error: 'Invalid credentials' });

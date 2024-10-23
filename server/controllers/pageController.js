@@ -7,6 +7,9 @@ const {Op, where} = require('sequelize');
 const jwt = require('jsonwebtoken');
 const QRCode = require('qrcode');
 const {syncUserCards} = require('../utils/syncUtils');
+const {filterObjectsByDistance} = require('../utils/distanceUtils');
+const { decrypt, encrypt } = require('../utils/gostEncoder');
+
 
 const createPath = (page) => path.resolve(__dirname, '../../public/templates/', `${page}.ejs`);
 
@@ -39,6 +42,8 @@ exports.index = async (req, res) => {
               }
             ]
         });
+        user = user.getDecryptedData();
+
         userCardsRaw = await users_cards.findAll({ where: {user_id: user.id} });
 
         // Извлекаем ID карточек, которые уже есть у пользователя
@@ -117,7 +122,7 @@ exports.get_user = async (req, res) => {
                 }]
             }]
         });
-
+        user = user.getDecryptedData();
         user.cards = user.cards.map(card => {
             const newCard = { ...card };
             delete newCard.card;
@@ -162,6 +167,7 @@ exports.scan = async (req, res) => {
             })
         };
         let user = await User.findOne({ where: {id: userData.user_id} });
+        
         let userCardsRaw = await users_cards.findAll({ where: {user_id: user.id} });
 
         // Синхронизируем карточки
@@ -199,29 +205,38 @@ exports.claim_card = async (req, res) => {
     }
 }
 
+
+
 exports.get_events = async (req, res) => {
     try {
+        const {req_distance} = req.body;
+        const userData = jwt.decode(req.cookies.accessToken);
+        const user = await User.findByPk(userData.user_id); // Assume userId is available
+
+        const userCoordinates = user.adr_coordinates.split(',').map(Number);
 
         const eventParticipants = await Event_participants.findAll({
             include: [{
-              model: Events,
-              as: 'event'
+            model: Events,
+            as: 'event'
             }]
         });
 
         const eventIds = eventParticipants.map(ep => ep.event_id);
 
-        // Получаем события, которые происходят в будущем, исключая те, что есть в eventParticipants
-        const events = await Events.findAll({
+        const allEvents = await Events.findAll({
             where: {
                 date: { [Op.gt]: new Date() },
-                id: { [Op.notIn]: eventIds } // Исключаем события, которые уже есть у участников
-            }
+                id: { [Op.notIn]: eventIds }
+            },
+            order: [['date', 'ASC']] // Add this line for sorting
         });
-        
+
+        const nearbyEvents = filterObjectsByDistance(allEvents, userCoordinates, req_distance);
+
         const participatedEvents = eventParticipants.map(ep => ep.event);
-        console.log(eventParticipants);
-        return res.json({events: events, my_events: participatedEvents}).status(200);
+
+        return res.json({ events: nearbyEvents, my_events: participatedEvents }).status(200);
     } catch(e) {
         console.log(e);
         return res.redirect('/');
@@ -414,37 +429,38 @@ exports.get_tests = async (req, res) => {
     try {
         const userData = jwt.decode(req.cookies.accessToken);
 
-        // Get all test IDs the user has completed
+        // Get all completed results for the user
         const completedResults = await UserResults.findAll({
             where: { user_id: userData.user_id, completed_at: { [Op.not]: null } },
-            attributes: ['test_id']
+            attributes: ['test_id', 'score'] // Include score in the results
         });
 
         const completedTestIds = completedResults.map(result => result.test_id);
 
-        // Function to add question count to tests
-        const addQuestionCount = async (tests) => {
-            const testsWithCounts = await Promise.all(tests.map(async (test) => {
+        // Function to add question count and score to tests
+        const addQuestionCountAndScore = async (tests, completedResults) => {
+            return await Promise.all(tests.map(async (test) => {
                 const questionCount = await Questions.count({ where: { test_id: test.id } });
+                const completedResult = completedResults.find(result => result.test_id === test.id);
                 return {
                     ...test.toJSON(),
-                    questionCount
+                    questionCount,
+                    score: completedResult ? completedResult.score : null // Add score if completed
                 };
             }));
-            return testsWithCounts;
         };
 
-        // Get completed tests with question counts
+        // Get completed tests with question counts and scores
         const completedTests = await Tests.findAll({
             where: { id: completedTestIds }
         });
-        const completedTestsWithCounts = await addQuestionCount(completedTests);
+        const completedTestsWithCounts = await addQuestionCountAndScore(completedTests, completedResults);
 
         // Get tests not completed by the user with question counts
         const notCompletedTests = await Tests.findAll({
             where: { id: { [Op.notIn]: completedTestIds } }
         });
-        const notCompletedTestsWithCounts = await addQuestionCount(notCompletedTests);
+        const notCompletedTestsWithCounts = await addQuestionCountAndScore(notCompletedTests, []);
 
         res.status(200).json({
             my_tasks: completedTestsWithCounts,
@@ -452,7 +468,7 @@ exports.get_tests = async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Произошла ошибка при загрузке тестов' });
+        res.status(500).send('Internal Server Error');
     }
 }
 
@@ -534,7 +550,9 @@ exports.submit_test = async (req, res) => {
             });
             if(card) {
                 await users_cards.update({
-                    card_lvl: parseInt(card.card_lvl)+1,
+                    card_lvl: parseInt(card.card_lvl)+1
+                },
+                {
                     where: {
                         user_id: userData.user_id,
                         card_id: reward.reward_id

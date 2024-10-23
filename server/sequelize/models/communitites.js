@@ -33,6 +33,12 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.TEXT,
             allowNull: true
         },
+        address: {
+            type: DataTypes.TEXT
+        },
+        adr_coordinates: {
+            type: DataTypes.TEXT
+        },
         createdAt: {
             type: DataTypes.DATE,
             defaultValue: DataTypes.NOW

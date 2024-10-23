@@ -48,6 +48,26 @@
     <%- include('refresh') %>
     <%- include('header') %>
     <div class="main-content">
+        <div class="address">
+            <div class="update-address">
+                <img src="/img/ui/location-icon.svg" alt="">
+                <span data-fullAddress="<%= user.address %>" id="user_address"><%= user.address %></span>
+            </div>
+            <div class="dropdown">
+                <span><span id="distance">+50</span> км</span>
+                <div class="dropdown-content none">
+                    <span onclick="updateDistance(10)">+10 км</span>
+                    <span onclick="updateDistance(50)">+50 км</span>
+                    <span onclick="updateDistance(100)">+100 км</span>
+                    <span onclick="updateDistance(200)">+200 км</span>
+                    <span onclick="updateDistance(500)">+500 км</span>
+                    <span onclick="updateDistance(1000)">+1000 км</span>
+                    <span onclick="updateDistance(2000)">+2000 км</span>
+                    <span onclick="updateDistance(5000)">+5000 км</span>
+                </div>
+            </div>
+        </div>
+        <br>
         <div class="tabs">
             <div class="tab active" data-tab="my_cards" id="my_cards_tab">Мои карточки</div>
             <div class="tab" data-tab="new_cards" id="new_cards_tab">Новые карточки</div>
@@ -148,11 +168,120 @@
             <br>
             <p style="text-align: justify; margin: 15px; overflow-y: auto; max-height: 20vh; line-height: 20px" id="detailDescription"></p>
         </div>
+
+        <div class="details-panel" id="eventToolPanel" >
+            <span class="close-btn" onclick="hideDetails()">×</span>
+            <form id="create_event_tool" class="create-event-tool">
+                <label for="event_img" class="file-label">Выберите обложку</label>
+                <input type="file" class="" name="event_img" id="event_img">
+                <label for="event_datetime">Время начала</label>
+                <input type="datetime-local" class="form-element" name="event_datetime" id="event_datetime" placeholder="Выберите время начала мероприятия">
+                <select class="form-element" name="event_reward" id="event_reward">
+                    <option value="-1">Выберите награду</option>
+                </select>
+                <input type="text" class="form-element" name="event_title" placeholder="Введите название мероприятия" id="event_title">
+                <input type="text" class="form-element" style="height: 20vw !important;" name="event_description" id="event_description" placeholder="Введите описание мероприятия">
+                <input type="text" class="form-element" name="event_address" id="event_address" placeholder="Введите адрес проведения">
+                
+                <button type="submit" class="form-element" style="background-color: #5b5b5e !important; ">Создать</button>
+            </form>
+            <script>
+                const form = document.getElementById('create_event_tool');
+        
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+        
+                    const formData = new FormData(e.target);
+        
+                    fetch('/communities/create_event', {
+                        method: 'POST',
+                        body: formData,
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Success:', data);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                });
+            </script>
+        </div>
     </div>
     <div id="popup">Вы записаны на участие в событии!</div>
     <%- include('footer') %>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.4/html5-qrcode.min.js" integrity="sha512-k/KAe4Yff9EUdYI5/IAHlwUswqeipP+Cp5qnrsUjTPCgl51La2/JhyyjNciztD7mWNKLSXci48m7cctATKfLlQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
+    <script>
+        document.addEventListener('click', function(event) {
+            if(event.target.id == 'create_event_form') {
+                fetch('/communities/get_create_event_form', {method: 'POST'})
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    createEventTool(data.cards);
+                })
+                .catch(error => {
+                    console.error('Ошибка при загрузке данных:', error);
+                });
+            }
+        });
 
+        /*
+        
+        */
+        function createEventTool(cards) {
+            const eventTool = document.querySelector('#eventToolPanel');
+            eventTool.classList.add('active');
+            const rewards = eventTool.querySelector('#event_reward');
+            console.log(cards);
+            cards.forEach(card => {
+                const option = document.createElement('option');
+                option.value = card.id;
+                option.textContent = `Карточка "${card.name}"`;
+                rewards.appendChild(option);
+            });
+        }
+
+        function extractCity(address, element_id) {
+            // Регулярное выражение для поиска города в любом месте строки
+            const match = address.match(/(?:г\.|пгт\.|пос\.|хутор)\s*([^\s,]+)/g);
+            if (match) {
+                document.getElementById(element_id).innerText = match[0];
+                return match[0].replace(/(?:г\.|пгт\.|пос\.|хутор)\s*/, '');
+            }
+            return null;
+        }
+
+        extractCity('<%= user.address %>', 'user_address');
+
+        function toggleDropdown() {
+            const dropdown = document.querySelector('.dropdown-content');
+            dropdown.classList.toggle('none');
+        }
+
+        function updateDistance(distance) {
+            document.getElementById('distance').textContent = `+${distance}`;
+            const activeButton = document.querySelector('.footer').querySelector('.active');
+            if(activeButton) {
+                activeButton.classList.remove('active');
+                handleTabSwitch(activeButton.dataset.page);
+            }
+            toggleDropdown();
+        }
+
+        // Close the dropdown if clicked outside
+        document.addEventListener('click', function(event) {
+            if (event.target.id ==  'distance') {
+                toggleDropdown();
+            }
+        })
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // Инициализация переключателей вкладок и кнопок
@@ -164,8 +293,8 @@
     
             // Общая обработка кликов по участию
             document.addEventListener('click', handleParticipationClick);
-            document.addEventListener('click', getMemberInfo)
-    
+            document.addEventListener('click', getMemberInfo);
+
             // Инициализация индикатора вкладок
             const tabs = document.querySelectorAll('.tab');
             tabs.forEach(tab => tab.addEventListener('click', () => handleTabClick(tab)));
@@ -243,18 +372,23 @@
             if(document.querySelector(activeButton).classList.contains('active')) return;
             if(prevActiveBtn) { prevActiveBtn.classList.remove('active'); }
     
-            fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' } })
-                .then(response => response.json())
-                .then(data => {
+            fetch(endpoint, { method: 'POST', 
+                headers: { 'Content-Type': 'application/json' },
+                body: (endpoint=='/get_events' || endpoint=='/communities/render_communities') ? JSON.stringify({req_distance: parseInt(document.querySelector('#distance').innerText) }) : ''
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(section == 'my_community') {
                     console.log(data);
-                    document.querySelector(activeButton).classList.add('active');
-                    updateTabsVisibility(upbarTabs, myTab);
+                }
+                document.querySelector(activeButton).classList.add('active');
+                updateTabsVisibility(upbarTabs, myTab);
 
-                    renderContent(section, data);
-                })
-                .catch(error => {
-                    console.error('Ошибка при загрузке данных:', error);
-                });
+                renderContent(section, data);
+            })
+            .catch(error => {
+                console.error('Ошибка при загрузке данных:', error);
+            });
         }
     
         // Обновление видимости вкладок
@@ -396,13 +530,18 @@
             taskDiv.dataset.card = task.id;
             taskDiv.dataset.type = type;
             //taskDiv.setAttribute('onclick', 'showDetails(this, "task_card")');
-    
+            let task_type = '';
+            if(task.score) {
+                task_type = `<span>${task.score}/${task.questionCount} очков</span>`;
+            } else {
+                task_type = `<button id="start_task" onclick="getAndStartTest(${task.id})">Начать</button>`;
+            }
             taskDiv.innerHTML = `
                 <p><strong id="card-title">${task.title}</strong></p>
                 <p id="card-description">${task.description}</p>
                 <div class="card-footer">
                     <p>Количество вопросов: <span id='card-questions_count'>${task.questionCount}</span></p>
-                    <button id="start_task" onclick="getAndStartTest(${task.id})">Начать тест</button>
+                    ${task_type}
                 </div>
             `;
             return taskDiv;
@@ -419,18 +558,27 @@
             communityDiv.dataset.type = type;
             communityDiv.dataset.reward = community.reward_id;
             communityDiv.setAttribute('onclick', 'showDetails(this, "community_card")');
+            let card_body = '';
             let members = '';
             if(community.members) {
+                if(community.members[0].User_communities.role === 'admin') {
+                    card_body = `<p class="community-element" id="create_event_form">+ Событие</p> <p class="community-element" >+ Задание</p>`
+                }
                 community.members.forEach(member => {
-                    members+= `<p class='community-member' data-user="${member.id}">${member.firstName} ${member.lastName}</p>`;
+                    members+= `<p class='community-member' data-user="${member.id}">${member.firstName} ${member.lastName} ${member.role == 'admin' ? '(Администратор)' : ''}</p>`;
                 });
             } else {
-                members = 'Чтобы посмотреть участников, нужно вступить в сообщество.'
+                members = `
+                    <h2>Чтобы посмотреть участников, нужно вступить в сообщество.</h2>
+                    <button id="join_community" onclick="join_community(${community.id})">Присоединиться</button>
+                    `
             }
-            
             communityDiv.innerHTML = `
                 <p><strong id="card-title">${community.name}</strong></p>
                 <p id="card-description">${community.description}</p>
+                <div class="card-body">
+                    ${card_body}
+                </div>
                 <div class="card-footer">
                     <div style="display: flex; flex-direction: column;">
                         <h2 style="margin: 10px 0 2px 0 !important; font-weight: 600;">Участники</h2>
@@ -439,6 +587,22 @@
                 </div>
             `;
             return communityDiv;
+        }
+
+        function join_community(community_id) {
+            fetch(`/communities/${community_id}/join`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                showPopup('Вы приняты в сообщество!');
+                handleTabSwitch('my_community');
+                document.querySelector('#btn_new_communities').classList.toggle('none');
+                document.querySelector('#btn_my_community').classList.toggle('none');
+            })
+            .catch(error => {
+                console.error('Ошибка при отправке данных:', error);
+            });
         }
 
         // Обработка кликов по участию в событиях
@@ -692,20 +856,9 @@
         };
 
         document.addEventListener('DOMContentLoaded', function() {
-            const cards = document.querySelectorAll('.card');
-            let expSum = 0;
-            cards.forEach(card => {
-                const levelElement = card.querySelector('.current-level');
-                const expElement = card.querySelector('.current-exp');
-                
-                const cardLevel = parseInt(levelElement.innerText, 10);
-                const cardExp = parseInt(expElement.innerText, 10);
-                
-                const cardSum = cardExp;
-                expElement.innerText = cardSum;
-                expSum += cardSum;
-            });
-            fillExpBar(expSum);
+            <% if(locals.user) { %> 
+                fillExpBar(<%= user.totalExp %>);
+            <% } %>
         });
     </script>
 
@@ -795,8 +948,9 @@
                 detailsPanel.querySelector('#user_lvl').innerText = card.lvl;
 
                 const card_container = detailsPanel.querySelector('.user-card-container');
+                card_container.innerHTML = '';
                 card.cards.forEach(item => {
-                    const card = createDefaultCard(item.card, 'other');
+                    const card = createDefaultCard(item.dataValues, 'other');
                     card_container.appendChild(card);
                 })
 
@@ -964,6 +1118,8 @@
         }
         
     </script>
+
+
 
 </body>
 </html>

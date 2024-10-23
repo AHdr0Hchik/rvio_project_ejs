@@ -206,18 +206,42 @@ body {
 }
 
 .bg-legendary {
-    background: linear-gradient(135deg, #d1b100, #2c2c2e);
+    background: linear-gradient(135deg, #9a8300, #2c2c2e);
 }
 
 .bg-rare {
-    background: linear-gradient(135deg, #7a00d0, #2c2c2e);
+    background: linear-gradient(135deg, #4e0086, #2c2c2e);
 }
 
 .bg-common {
-    background: linear-gradient(135deg, #00d031, #2c2c2e);
+    background: linear-gradient(135deg, #00831f, #2c2c2e);
 }
 
-
+.dropdown {
+    display: flex;
+    position: relative;
+}
+.dropdown-content {
+    position: fixed;
+    right: 5px;
+    background-color: #f9f9f9;
+    min-width: 70px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+}
+.dropdown-content span {
+    color: black;
+    padding: 8px 12px;
+    text-decoration: none;
+    display: block;
+    cursor: pointer;
+}
+.dropdown-content span:hover {
+    background-color: #f1f1f1;
+}
+.dropdown.active .dropdown-content {
+    display: block;
+}
 
 .card img {
     width: 100%;
@@ -396,6 +420,11 @@ input[type="radio"] {
     margin: 10px 0;
 }
 
+.card-body {
+    display: flex;
+    justify-content: space-around;
+}
+
 .card-footer {
     display: flex;
     justify-content: space-between;
@@ -423,6 +452,22 @@ input[type="radio"] {
     .card {
         width: 90%;
     }
+}
+
+.address {
+    display: flex;
+    justify-content: end;
+}
+.address span {
+    padding: 5px;
+}
+.address img {
+    max-height: 25px;
+    filter: invert(100%);
+}
+
+.update-address {
+    display: flex;
 }
 
 .details-panel {
@@ -545,3 +590,59 @@ h2 {
     transform: scale(1.1, 1.1);
     transition: 0.3s ease ;
 }   
+
+.community-element {
+    margin: 2px 0;
+    padding: 10px;
+    background-color: #3a3a3c;
+    border-radius: 5px;
+    transition: 0.3s ease;
+}
+
+.community-element:active {
+    background-color: #4a4a4c;
+    transform: scale(1.1, 1.1);
+    transition: 0.3s ease ;
+}   
+
+
+#event_img {
+    display: none;
+}
+
+.create-event-tool {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 3vh 10vw;
+}
+
+.file-label {
+    display: inline-block;
+    padding: 10px 20px;
+    color: white;
+    background-color: #4b4b4e;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    height: 40vw;
+    line-height: 35vw;
+}
+
+.form-element {
+    display: inline-block;
+    padding: 10px 20px;
+    color: white;
+    background-color: #4b4b4e;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    height: 10vw;
+    text-align: center;
+}
+
+.file-label:active {
+    background-color: #626265;
+}
